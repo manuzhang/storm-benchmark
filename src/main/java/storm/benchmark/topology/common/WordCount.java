@@ -1,7 +1,8 @@
-package storm.benchmark.topology;
+package storm.benchmark.topology.common;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
+import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -11,31 +12,33 @@ import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
-import storm.benchmark.spout.FileReadSpout;
+import storm.benchmark.trident.functions.WordSplit;
 import storm.benchmark.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class WordCount extends StormBenchmark {
+public abstract class WordCount extends StormBenchmark {
   private static final String SPOUT = "spout";
   private static final String SPLIT = "split";
   private static final String COUNT = "count";
 
-  // number of spouts to run in parallel
-  private int spouts = 8;
+  // number of spoutNum to run in parallel
+  protected int spoutNum = 8;
   // number of split bolts to run in parallel
-  private int spBolts = 4;
+  protected int spBoltNum = 4;
   // number of count bolts to run in parallel
-  private int cntBolts = 4;
+  protected int cntBoltNum = 4;
+
+  protected IRichSpout spout;
 
   @Override
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spouts = Util.retIfPositive(spouts, (Integer) options.get(SPOUT));
-    spBolts = Util.retIfPositive(spBolts, (Integer) options.get(SPLIT));
-    cntBolts = Util.retIfPositive(cntBolts, (Integer) options.get(COUNT));
+    spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
+    spBoltNum = Util.retIfPositive(spBoltNum, (Integer) options.get(SPLIT));
+    cntBoltNum = Util.retIfPositive(cntBoltNum, (Integer) options.get(COUNT));
 
     metrics = new BasicMetrics();
 
@@ -46,10 +49,10 @@ public class WordCount extends StormBenchmark {
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
 
-    builder.setSpout(SPOUT, new FileReadSpout(config.ifAckEnabled(),  "line"), spouts);
-    builder.setBolt(SPLIT, new SplitSentence(), spBolts).localOrShuffleGrouping(
+    builder.setSpout(SPOUT, spout, spoutNum);
+    builder.setBolt(SPLIT, new SplitSentence(), spBoltNum).localOrShuffleGrouping(
             SPOUT);
-    builder.setBolt(COUNT, new Count(), cntBolts).fieldsGrouping(SPLIT,
+    builder.setBolt(COUNT, new Count(), cntBoltNum).fieldsGrouping(SPLIT,
       new Fields("word"));
     topology = builder.createTopology();
 
@@ -64,8 +67,7 @@ public class WordCount extends StormBenchmark {
 
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
-      String line = input.getString(0);
-      for (String word : line.split(" ")) {
+      for (String word : WordSplit.splitSentence(input.getString(0))) {
         collector.emit(new Values(word));
       }
     }

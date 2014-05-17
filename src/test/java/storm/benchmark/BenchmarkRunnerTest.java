@@ -1,39 +1,44 @@
-package storm.benchmark.topology;
+package storm.benchmark;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import storm.benchmark.BenchmarkRunner;
-import storm.benchmark.IBenchmark;
+
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(JUnitParamsRunner.class)
 public class BenchmarkRunnerTest {
 
-  @Test
-  @Parameters(method = "getValidNames")
+  @Test(dataProvider = "getValidNames")
   public void returnBenchmarkFromValidName(String validName) throws Exception {
     assertTrue(BenchmarkRunner.getBenchmarkFrom(validName) instanceof IBenchmark);
   }
 
-  @Test(expected = ClassNotFoundException.class)
-  @Parameters(method = "getInValidNames")
+  @Test(dataProvider = "getInValidNames", expectedExceptions = ClassNotFoundException.class)
   public void throwsExceptionFromInvalidName(String invalidName)
           throws InstantiationException, IllegalAccessException, ClassNotFoundException {
     BenchmarkRunner.getBenchmarkFrom(invalidName);
   }
 
-
-  private Object[] getValidNames() {
+  @DataProvider
+  private Object[][] getValidNames() {
     return new String[][]{
-            {"WordCount"}, {"SOL"},
-            {"storm.benchmark.topology.WordCount"}, {"storm.benchmark.topology.SOL"}
+            {"FileReadWordCount"}, {"storm.benchmark.topology.FileReadWordCount"},
+            {"SOL"}, {"storm.benchmark.topology.SOL"},
+            {"Grep"}, {"storm.benchmark.topology.Grep"},
+            {"KafkaPageView"}, {"storm.benchmark.topology.KafkaPageView"},
+            {"KafkaUniqueVisitor"}, {"storm.benchmark.topology.KafkaUniqueVisitor"},
+            {"KafkaWordCount"}, {"storm.benchmark.topology.KafkaWordCount"},
+            {"Reach"}, {"storm.benchmark.topology.Reach"},
+            {"RollingSort"}, {"storm.benchmark.topology.RollingSort"},
+            {"SOL"}, {"storm.benchmark.topology.SOL"},
+            {"TridentWordCount"}, {"storm.benchmark.topology.TridentWordCount"},
+            {"storm.benchmark.kafka.KafkaFileProducer"},
+            {"storm.benchmark.kafka.KafkaPageViewProducer"}
     };
   }
 
-  private Object[] getInValidNames() {
+  @DataProvider
+  private Object[][] getInValidNames() {
     return new String[][]{{"foo"}, {"bar"}};
   }
 }

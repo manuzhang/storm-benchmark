@@ -1,18 +1,15 @@
 package storm.benchmark.topology;
 
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.TridentMetrics;
-import storm.benchmark.spout.TridentFileReadSpout;
+import storm.benchmark.trident.functions.WordSplit;
+import storm.benchmark.trident.spout.TridentFileReadSpout;
 import storm.benchmark.util.Util;
 import storm.trident.TridentTopology;
-import storm.trident.operation.BaseFunction;
-import storm.trident.operation.TridentCollector;
 import storm.trident.operation.builtin.Count;
 import storm.trident.testing.MemoryMapState;
-import storm.trident.tuple.TridentTuple;
 
 import java.util.Map;
 
@@ -53,11 +50,10 @@ public class TridentWordCount extends StormBenchmark {
 
 
     TridentFileReadSpout spout = new TridentFileReadSpout(new Fields("sentence"), maxBatchSize);
-    spout.setCycle(true);
 
     TridentTopology trident = new TridentTopology();
     trident.newStream(SPOUT, spout).parallelismHint(spouts)
-      .each(new Fields("sentence"), new Split(), new Fields("word")).parallelismHint(splits)
+      .each(new Fields("sentence"), new WordSplit(), new Fields("word")).parallelismHint(splits)
       .groupBy(new Fields("word"))
       .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("count")).parallelismHint(counts);
 
@@ -66,13 +62,5 @@ public class TridentWordCount extends StormBenchmark {
     return this;
   }
 
-  public static class Split extends BaseFunction {
-    @Override
-    public void execute(TridentTuple tuple, TridentCollector collector) {
-      String sentence = tuple.getString(0);
-      for (String word : sentence.split(" ")) {
-        collector.emit(new Values(word));
-      }
-    }
-  }
+
 }

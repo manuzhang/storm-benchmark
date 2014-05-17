@@ -1,4 +1,4 @@
-package storm.benchmark.metrics;
+/*package storm.benchmark.metrics;
 
 
 import backtype.storm.metric.api.IMetricsConsumer;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;*/
 
 /*
  * Listens for all metrics, reports to Ganglia
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-public class GangliaMetricsConsumer implements IMetricsConsumer {
+/*public class GangliaMetricsConsumer implements IMetricsConsumer {
   private final Logger LOG = LoggerFactory.getLogger(GangliaMetricsConsumer.class);
   private final String GANGLIA_HOST = "192.168.1.71";
 
@@ -64,4 +64,4 @@ public class GangliaMetricsConsumer implements IMetricsConsumer {
     }
  }
 
-}
+}*/

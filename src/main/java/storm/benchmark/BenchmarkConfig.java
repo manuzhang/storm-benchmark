@@ -7,10 +7,14 @@ import storm.benchmark.util.Util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * BenchmarkConfig holds Storm config and Benchmark options
+ * It also provides default values to config if not set by user
+ */
 public class BenchmarkConfig {
   public static final String METRICS_CONSUMER = "metrics.consumer";
   public static final String METRICS_CONSUMER_PARALLELISM = "metrics.consumer.parallelism";
-
+  public static final String MESSAGE_SIZE = "message.size";
   // enable debug
   public static final boolean ENABLE_DEBUG = false;
  // base name of the topology
@@ -29,10 +33,14 @@ public class BenchmarkConfig {
   // default size for worker transfer buffer
   public static final int DEFAULT_WTBSIZE = 32;
 
-  private Config config = new Config();
-  private Map options = new HashMap();
+  private final Config config;
+  private final Map options;
 
   private static final Logger LOG = Logger.getLogger(BenchmarkConfig.class);
+
+  public BenchmarkConfig() {
+    this(new Config(), new HashMap());
+  }
 
   public BenchmarkConfig(Map options) {
     this(new Config(), options);

@@ -22,77 +22,58 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import storm.benchmark.util.Util;
 
 import java.util.Map;
 import java.util.Random;
 
-public class SOLSpout extends BaseRichSpout {
-  private int _sizeInBytes;
-  private long _messageCount;
-  private SpoutOutputCollector _collector;
-  private String [] _messages = null;
-  private boolean _ackEnabled;
-  private String _field = "message";
-  private Random _rand = null;
-  public SOLSpout(int sizeInBytes, boolean ackEnabled, String field) {
-    if(sizeInBytes < 0) {
-      sizeInBytes = 0;
-    }
-    _sizeInBytes = sizeInBytes;
-    _messageCount = 0;
-    _ackEnabled = ackEnabled;
-    _field = field;
-  }
+public class RandomMessageSpout extends BaseRichSpout {
 
-  public boolean isDistributed() {
-    return true;
+  private static final long serialVersionUID = -4100642374496292646L;
+  private int sizeInBytes;
+  private long messageCount;
+  private SpoutOutputCollector collector;
+  private String [] messages = null;
+  private boolean ackEnabled;
+  private Random rand = null;
+
+  public RandomMessageSpout(int sizeInBytes, boolean ackEnabled) {
+    this.sizeInBytes = Util.retIfPositive(0, sizeInBytes);
+    this.messageCount = 0;
+    this.ackEnabled = ackEnabled;
   }
 
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
-    _rand = new Random();
-    _collector = collector;
+    this.rand = new Random();
+    this.collector = collector;
     final int differentMessages = 100;
-    _messages = new String[differentMessages];
+    this.messages = new String[differentMessages];
     for(int i = 0; i < differentMessages; i++) {
-      StringBuilder sb = new StringBuilder(_sizeInBytes);
+      StringBuilder sb = new StringBuilder(sizeInBytes);
       //Even though java encodes strings in UCS2, the serialized version sent by the tuples
       // is UTF8, so it should be a single byte
-      for(int j = 0; j < _sizeInBytes; j++) {
-        sb.append(_rand.nextInt(9));
+      for(int j = 0; j < sizeInBytes; j++) {
+        sb.append(rand.nextInt(9));
       }
-      _messages[i] = sb.toString();
+      messages[i] = sb.toString();
     }
   }
 
-  @Override
-  public void close() {
-    //Empty
-  }
 
   @Override
   public void nextTuple() {
-    final String message = _messages[_rand.nextInt(_messages.length)];
-    if(_ackEnabled) {
-      _collector.emit(new Values(message), _messageCount);
+    final String message = messages[rand.nextInt(messages.length)];
+    if(ackEnabled) {
+      collector.emit(new Values(message), messageCount);
     } else {
-      _collector.emit(new Values(message));
+      collector.emit(new Values(message));
     }
-    _messageCount++;
+    messageCount++;
   }
 
-
-  @Override
-  public void ack(Object msgId) {
-    //Empty
-  }
-
-  @Override
-  public void fail(Object msgId) {
-    //Empty
-  }
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(_field));
+    declarer.declare(new Fields("message"));
   }
 }

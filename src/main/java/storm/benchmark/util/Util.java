@@ -46,6 +46,10 @@ public final class Util {
     }
   }
 
+  public static Object retIfNotNull(Object defVal, Object newVal) {
+    return (null == newVal) ? defVal : newVal;
+  }
+
   public static void putIfAbsent(Map map, Object key, Object val) {
     if (!map.containsKey(key)) {
       map.put(key, val);

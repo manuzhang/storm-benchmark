@@ -1,6 +1,7 @@
 package storm.benchmark.topology;
 
 import backtype.storm.metric.api.CountMetric;
+import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -12,8 +13,10 @@ import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
-import storm.benchmark.spout.FileReadSpout;
 import storm.benchmark.util.Util;
+import storm.kafka.KafkaSpout;
+import storm.kafka.SpoutConfig;
+import storm.kafka.StringScheme;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,6 +39,7 @@ public class Grep extends StormBenchmark {
   // number of count bolts to run in parallel
   protected int cntBolts = 4;
 
+  protected SpoutConfig spoutConfig;
 
   @Override
   public IBenchmark parseOptions(Map options) {
@@ -46,6 +50,7 @@ public class Grep extends StormBenchmark {
     matBolts = Util.retIfPositive(matBolts, (Integer) options.get(FM));
     cntBolts = Util.retIfPositive(cntBolts, (Integer) options.get(CM));
 
+    spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
     metrics = new BasicMetrics();
 
     return this;
@@ -53,8 +58,7 @@ public class Grep extends StormBenchmark {
   @Override
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
-
-    builder.setSpout(SPOUT, new FileReadSpout(), spouts);
+    builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spouts);
     builder.setBolt(FM, new FindMatchingSentence(), matBolts)
             .shuffleGrouping(SPOUT);
     builder.setBolt(CM, new CountMatchingSentence(), cntBolts)

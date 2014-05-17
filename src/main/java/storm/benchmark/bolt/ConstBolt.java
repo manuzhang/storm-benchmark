@@ -1,6 +1,5 @@
 package storm.benchmark.bolt;
 
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -11,14 +10,11 @@ import backtype.storm.tuple.Values;
 
 import java.util.Map;
 
-public class SOLBolt extends BaseBasicBolt {
-  private String field = "message";
+public class ConstBolt extends BaseBasicBolt {
 
-  public SOLBolt() {
-  }
+  private static final long serialVersionUID = -5313598399155365865L;
 
-  public SOLBolt(String field) {
-    this.field = field;
+  public ConstBolt() {
   }
 
   @Override
@@ -31,11 +27,7 @@ public class SOLBolt extends BaseBasicBolt {
   }
 
   @Override
-  public void cleanup() {
-  }
-
-  @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(field));
+    declarer.declare(new Fields("message"));
   }
 }

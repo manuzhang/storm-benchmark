@@ -3,8 +3,10 @@ package storm.benchmark;
 import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
 
-import java.util.concurrent.Semaphore;
-
+/**
+ * BenchmarkRunner is the main class for StormBenchmark
+ * It instantiates a benchmark from passed-in name (either with or with out package name)
+ */
 public class BenchmarkRunner {
   private static final Logger LOG = Logger.getLogger(BenchmarkRunner.class);
 
@@ -33,7 +35,7 @@ public class BenchmarkRunner {
   public static IBenchmark getBenchmarkFrom(String name)
           throws ClassNotFoundException, InstantiationException, IllegalAccessException {
     String packName = "storm.benchmark.topology";
-    if (name.startsWith(packName)) {
+    if (name.startsWith(packName) || name.contains(".")) {
       return getBenchmarkFrom(Class.forName(name));
     } else {
       return getBenchmarkFrom(Class.forName(packName + "." + name));

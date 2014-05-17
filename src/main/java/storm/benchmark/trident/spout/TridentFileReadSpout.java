@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package storm.benchmark.spout;
+package storm.benchmark.trident.spout;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import storm.benchmark.util.FileUtils;
+import storm.benchmark.tools.FileReader;
 import storm.trident.operation.TridentCollector;
 import storm.trident.spout.IBatchSpout;
 
@@ -31,30 +31,27 @@ import java.util.Map;
 
 
 public class TridentFileReadSpout implements IBatchSpout {
-  private final String FILE = "/resources/A_Tale_of_Two_City.txt";
+
+  private static final long serialVersionUID = -3538746749629409899L;
+  private static final String DEFAULT_FILE = "/resources/A_Tale_of_Two_City.txt";
 
   private Fields fields;
   private int maxBatchSize;
-  private List<String> lines = new ArrayList<String>();
+  private FileReader reader;
   private HashMap<Long, List<String>> batches = new HashMap<Long, List<String>>();
-  private int index = 0;
-  private int limit = 0;
-  private boolean cycle = false;
-
 
   public TridentFileReadSpout(Fields fields, int maxBatchSize) {
-    this.fields = fields;
-    this.maxBatchSize = maxBatchSize;
+    this(fields, maxBatchSize, DEFAULT_FILE);
   }
 
-  public void setCycle(boolean cycle) {
-    cycle = cycle;
+  public TridentFileReadSpout(Fields fields, int maxBatchSize, String file) {
+    this.fields = fields;
+    this.maxBatchSize = maxBatchSize;
+    this.reader = new FileReader(file);
   }
-    
+
   @Override
   public void open(Map conf, TopologyContext context) {
-    lines = FileUtils.readLines(this.getClass().getResourceAsStream(FILE));
-    limit = lines.size();
   }
 
   @Override
@@ -62,11 +59,8 @@ public class TridentFileReadSpout implements IBatchSpout {
     List<String> batch = batches.get(batchId);
     if (batch == null) {
       batch = new ArrayList<String>();
-      if (index >= limit && cycle) {
-        index = 0;
-      }
-      for (int i = 0; index < limit && i < maxBatchSize; index++, i++) {
-        batch.add(lines.get(i));
+      for (int i = 0;  i < maxBatchSize; i++) {
+        batch.add(reader.nextLine());
       }
       batches.put(batchId, batch);
     }

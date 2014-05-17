@@ -19,7 +19,7 @@ public final class FileUtils {
           lines.add(line);
         }
       } catch (IOException e) {
-        throw new RuntimeException("Reading file failed " + e);
+        throw new RuntimeException("Reading file failed", e);
       } finally {
         reader.close();
       }
@@ -29,11 +29,15 @@ public final class FileUtils {
     return lines;
   }
 
-  public static PrintWriter createFileWriter(String name) throws IOException {
-    final File file = new File(name);
-    file.createNewFile();
-    final PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+  public static PrintWriter createFileWriter(String name) {
+    try {
+      final File file = new File(name);
+      file.createNewFile();
+      final PrintWriter writer = new PrintWriter(new OutputStreamWriter(
       new FileOutputStream(file, true)));
-    return writer;
+      return writer;
+    } catch (IOException e) {
+      throw new RuntimeException("No such file or directory " + name, e);
+    }
   }
 }

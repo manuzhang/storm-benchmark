@@ -40,7 +40,7 @@ public class BasicMetrics extends StormMetrics {
         now = System.currentTimeMillis();
       }
     } catch (Exception e) {
-      LOG.error(e.getMessage());
+      LOG.error("BasicMetrics failed! ", e);
     } finally {
       fileWriter.close();
       confWriter.close();
@@ -85,7 +85,6 @@ public class BasicMetrics extends StormMetrics {
     int executorsWithMetircs = 0;
     int spoutExecutors = 0;
     Map<String, List<Double>> comLat = new HashMap<String, List<Double>>();
-    Map<String, List<Double>> exeLat = new HashMap<String, List<Double>>();
     TopologyInfo info = client.getTopologyInfo(ts.get_id());
     for (ExecutorSummary es : info.get_executors()) {
       String id = es.get_component_id();
@@ -155,14 +154,6 @@ public class BasicMetrics extends StormMetrics {
     return null;
   }
 
-  private boolean isSpoutSummary(String id) {
-    return spouts.containsKey(id);
-  }
-
-  private boolean isBoltSummary(String id) {
-    return bolts.containsKey(id);
-  }
-
   private double getSpoutCompleteLatency(SpoutStats stats, String window, String stream) {
     Map<String, Map<String, Double>> latAll = stats.get_complete_ms_avg();
     if (latAll != null) {
@@ -191,22 +182,6 @@ public class BasicMetrics extends StormMetrics {
       }
     }
     return 0;
-  }
-
-  private double getBoltExecuteLatency(ExecutorSpecificStats specs, GlobalStreamId id) {
-    Map<String, Map<GlobalStreamId, Double>> latAll = specs.get_bolt().get_execute_ms_avg();
-    if (latAll != null) {
-      // latency in a time window
-      Map<GlobalStreamId, Double> latWin = latAll.get(LAST_TEN_MINS);
-      if (latWin != null) {
-        // latency in a stream
-        Double latStr = latWin.get(id);
-        if (latStr != null) {
-          return latStr;
-        }
-      }
-    }
-    return 0.0;
   }
 
   private long getTransferred(ExecutorStats stats) {
@@ -263,7 +238,8 @@ public class BasicMetrics extends StormMetrics {
       header.add(SPOUT_AVG_COMPELETE_LATENCY(id));
       header.add(SPOUT_MAX_COMPELETE_LATENCY(id));
     }
-    writer.println(Util.join(header, "\t"));
+    writer.println(Util.join(header, ","));
+    writer.flush();
   }
 
   private void writeLine(PrintWriter writer) {
@@ -271,7 +247,8 @@ public class BasicMetrics extends StormMetrics {
     for (String h : header) {
       line.add(metrics.get(h));
     }
-    writer.println(Util.join(line, "\t"));
+    writer.println(Util.join(line, ","));
+    writer.flush();
   }
 
   private String SPOUT_AVG_COMPELETE_LATENCY(String id) {
@@ -281,15 +258,6 @@ public class BasicMetrics extends StormMetrics {
   private String SPOUT_MAX_COMPELETE_LATENCY(String id) {
     return id + "_max_complete_lantency(ms)";
   }
-
-  private String BOLT_AVG_EXECUTE_LATENCY(String id) {
-    return id + "_avg_execute_latency(ms)";
-  }
-
-  private String BOLT_MAX_EXECUTE_LATENCY(String id) {
-    return id + "_max_execute_latency(ms)";
-  }
-
 
   private static class MetricsState {
     long overallTransferred = 0;
