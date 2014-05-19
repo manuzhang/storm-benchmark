@@ -67,11 +67,12 @@
             <artifactId>metrics-ganglia</artifactId>
             <version>3.0.1</version>
         </dependency>-->
-        <dependency>
+<!--        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
             <version>1.6.6</version>
-        </dependency>
+            <scope>provided</scope>
+        </dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

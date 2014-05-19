@@ -6,6 +6,7 @@ import backtype.storm.topology.TopologyBuilder;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
+import storm.benchmark.util.KafkaUtils;
 import storm.benchmark.util.Util;
 import storm.kafka.bolt.KafkaBolt;
 
@@ -32,7 +33,7 @@ public abstract class KafkaProducer extends StormBenchmark {
   protected int partitions = boltNum;
 
   protected IRichSpout spout;
-  protected final IRichBolt bolt = new KafkaBolt();
+  protected final IRichBolt bolt = new KafkaBolt<String, String>();
 
   @Override
   public IBenchmark parseOptions(Map options) {
@@ -63,9 +64,10 @@ public abstract class KafkaProducer extends StormBenchmark {
     Map kafkaConfig = new HashMap();
     Map brokerConfig = new HashMap();
     String brokers = (String) Util.retIfNotNull("localhost:9092", options.get(BROKER_LIST));
-    String topic = (String) Util.retIfNotNull("storm-sentence", options.get(TOPIC));
+    String topic = (String) Util.retIfNotNull(KafkaUtils.DEFAULT_TOPIC, options.get(TOPIC));
     brokerConfig.put("metadata.broker.list", brokers);
     brokerConfig.put("serializer.class", "kafka.serializer.StringEncoder");
+    brokerConfig.put("key.serializer.class", "kafka.serializer.StringEncoder");
     brokerConfig.put("request.required.acks", "1");
     kafkaConfig.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, brokerConfig);
     kafkaConfig.put(KafkaBolt.TOPIC, topic);

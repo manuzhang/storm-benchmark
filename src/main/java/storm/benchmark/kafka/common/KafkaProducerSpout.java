@@ -43,7 +43,7 @@ public abstract class KafkaProducerSpout extends BaseRichSpout {
     if (index >= partitions) {
       index = 0;
     }
-    collector.emit(new Values(index, message));
+    collector.emit(new Values(index + "", message));
     index++;
   }
 }

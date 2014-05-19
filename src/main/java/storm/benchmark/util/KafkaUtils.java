@@ -15,6 +15,8 @@ public final class KafkaUtils {
   public static final String TOPIC = "topic";
   public static final String APP_ID = "id";
 
+  public static final String DEFAULT_TOPIC = "storm";
+
   private KafkaUtils() {
   }
 
@@ -24,7 +26,7 @@ public final class KafkaUtils {
     String connectString = zkServers + kafkaRoot;
 
     BrokerHosts hosts = new ZkHosts(connectString);
-    String topic = (String) Util.retIfNotNull("storm", options.get(TOPIC));
+    String topic = (String) Util.retIfNotNull(DEFAULT_TOPIC, options.get(TOPIC));
     String zkRoot = kafkaRoot + "/" + "storm-consumer-states";
     String appId = (String) Util.retIfNotNull("storm-app", options.get(APP_ID));
 
