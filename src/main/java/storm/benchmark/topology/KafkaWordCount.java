@@ -18,7 +18,7 @@ public class KafkaWordCount extends WordCount {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spout = new KafkaSpout(KafkaUtils.getKafkaSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme())));
+    spout = new KafkaSpout(KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme())));
 
     return this;
   }

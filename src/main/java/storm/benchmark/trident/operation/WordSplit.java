@@ -1,4 +1,4 @@
-package storm.benchmark.trident.functions;
+package storm.benchmark.trident.operation;
 
 import backtype.storm.tuple.Values;
 import storm.trident.operation.BaseFunction;

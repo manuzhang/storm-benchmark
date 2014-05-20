@@ -12,7 +12,7 @@ import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
-import storm.benchmark.trident.functions.WordSplit;
+import storm.benchmark.trident.operation.WordSplit;
 import storm.benchmark.util.Util;
 
 import java.util.HashMap;

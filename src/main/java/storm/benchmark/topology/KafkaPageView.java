@@ -16,7 +16,7 @@ import storm.kafka.StringScheme;
 
 import java.util.Map;
 
-import static storm.benchmark.bolt.PageViewBolt.Item;
+import static storm.benchmark.tools.PageView.Item;
 
 public class KafkaPageView  extends StormBenchmark {
   private static final String SPOUT = "spout";
@@ -36,7 +36,7 @@ public class KafkaPageView  extends StormBenchmark {
     viewBoltNum = Util.retIfPositive(viewBoltNum, (Integer) options.get(VIEW));
     cntBoltNum = Util.retIfPositive(cntBoltNum, (Integer) options.get(COUNT));
 
-    spoutConfig = KafkaUtils.getKafkaSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme()));
+    spoutConfig = KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme()));
     metrics = new BasicMetrics();
     return this;
   }
@@ -47,7 +47,7 @@ public class KafkaPageView  extends StormBenchmark {
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spoutNum);
     builder.setBolt(VIEW, new PageViewBolt(Item.URL, Item.ONE), viewBoltNum)
-            .shuffleGrouping(SPOUT);
+           .localOrShuffleGrouping(SPOUT);
     builder.setBolt(COUNT, new WordCount.Count(), cntBoltNum)
             .fieldsGrouping(VIEW, new Fields(Item.URL.toString()));
     topology = builder.createTopology();

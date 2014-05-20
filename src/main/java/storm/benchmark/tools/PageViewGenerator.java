@@ -40,32 +40,6 @@ public class PageViewGenerator implements Serializable {
     return dist.getKeySet().iterator().next();
   }
 
-  public static class PageView {
-    public final String url;
-    public final int status;
-    public final int zipCode;
-    public final int userID;
-
-    public PageView(String url, int status, int zipCode, int userID) {
-      this.url = url;
-      this.status = status;
-      this.zipCode = zipCode;
-      this.userID = userID;
-    }
-
-    @Override
-    public String toString() {
-      return String.format("%s\t%d\t%d\t%d\n", url, status, zipCode, userID);
-    }
-
-    public static PageView fromString(String s) {
-      String[] parts = s.split("\t");
-      if (parts.length < 4) {
-        return null;
-      }
-      return new PageView(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
-    }
-  }
 
 
 }

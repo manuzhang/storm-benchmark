@@ -1,4 +1,4 @@
-package storm.benchmark.trident.functions;
+package storm.benchmark.trident.operation;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

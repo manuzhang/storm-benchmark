@@ -25,8 +25,7 @@ public abstract class StormBenchmark implements IBenchmark {
     if (null == topology) {
       throw new InvalidTopologyException("no topology defined");
     }
-    StormSubmitter.submitTopology(config.getTopologyName(), config.getStormConfig(), topology,
-            new SubmitOptions(TopologyInitialStatus.ACTIVE));
+    StormSubmitter.submitTopology(config.getTopologyName(), config.getStormConfig(), topology);
     return this;
   }
 

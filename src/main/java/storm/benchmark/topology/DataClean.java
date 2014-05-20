@@ -14,7 +14,7 @@ import storm.kafka.StringScheme;
 
 import java.util.Map;
 
-import static storm.benchmark.bolt.PageViewBolt.Item;
+import static storm.benchmark.tools.PageView.Item;
 
 public class DataClean extends StormBenchmark {
   private final static String SPOUT = "spout";

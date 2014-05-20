@@ -7,12 +7,12 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import storm.benchmark.tools.PageView;
 import storm.benchmark.util.MockTupleHelpers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static storm.benchmark.bolt.PageViewBolt.Item;
-import static storm.benchmark.tools.PageViewGenerator.PageView;
+import static storm.benchmark.tools.PageView.Item;
 
 public class PageViewBoltTest {
 
@@ -39,20 +39,20 @@ public class PageViewBoltTest {
     PageViewBolt bolt = new PageViewBolt(field1, field2);
 
     PageView  view1 = new PageView("http://view1", 200, 100000, 100);
-    assertEquals(view1.toString(), bolt.getValue(view1, Item.ALL));
-    assertEquals("http://view1", bolt.getValue(view1, Item.URL));
-    assertEquals(200, bolt.getValue(view1, Item.STATUS));
-    assertEquals(100000, bolt.getValue(view1, Item.ZIP));
-    assertEquals(100, bolt.getValue(view1, Item.USER));
-    assertEquals(1, bolt.getValue(view1, Item.ONE));
+    assertEquals(view1.toString(), view1.getValue(Item.ALL));
+    assertEquals("http://view1", view1.getValue(Item.URL));
+    assertEquals(200, view1.getValue(Item.STATUS));
+    assertEquals(100000, view1.getValue(Item.ZIP));
+    assertEquals(100, view1.getValue(Item.USER));
+    assertEquals(1, view1.getValue(Item.ONE));
 
     PageView  view2 = new PageView("http://view2", 400, 200000, 200);
-    assertEquals(view2.toString(), bolt.getValue(view2, Item.ALL));
-    assertEquals("http://view2", bolt.getValue(view2, Item.URL));
-    assertEquals(400, bolt.getValue(view2, Item.STATUS));
-    assertEquals(200000, bolt.getValue(view2, Item.ZIP));
-    assertEquals(200, bolt.getValue(view2, Item.USER));
-    assertEquals(1, bolt.getValue(view2, Item.ONE));
+    assertEquals(view2.toString(), view2.getValue(Item.ALL));
+    assertEquals("http://view2", view2.getValue(Item.URL));
+    assertEquals(400, view2.getValue(Item.STATUS));
+    assertEquals(200000, view2.getValue(Item.ZIP));
+    assertEquals(200, view2.getValue(Item.USER));
+    assertEquals(1, view2.getValue(Item.ONE));
   }
 
   @DataProvider

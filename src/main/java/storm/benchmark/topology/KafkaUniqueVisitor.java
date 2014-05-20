@@ -15,7 +15,7 @@ import storm.kafka.StringScheme;
 
 import java.util.Map;
 
-import static storm.benchmark.bolt.PageViewBolt.Item;
+import static storm.benchmark.tools.PageView.Item;
 
 public class KafkaUniqueVisitor extends StormBenchmark {
   private final static String SPOUT = "spout";
@@ -45,7 +45,7 @@ public class KafkaUniqueVisitor extends StormBenchmark {
     uvBoltNum = Util.retIfPositive(uvBoltNum, (Integer) options.get(UNIQUER));
     winLen = Util.retIfPositive(winLen, (Integer) options.get(WINDOW_LENGTH));
     emitFreq = Util.retIfPositive(emitFreq, (Integer) options.get(EMIT_FREQ));
-    spoutConfig = KafkaUtils.getKafkaSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme()));
+    spoutConfig = KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme()));
     return this;
   }
   @Override

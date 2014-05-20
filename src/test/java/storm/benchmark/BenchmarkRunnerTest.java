@@ -28,7 +28,7 @@ public class BenchmarkRunnerTest {
             {"KafkaPageView"}, {"storm.benchmark.topology.KafkaPageView"},
             {"KafkaUniqueVisitor"}, {"storm.benchmark.topology.KafkaUniqueVisitor"},
             {"KafkaWordCount"}, {"storm.benchmark.topology.KafkaWordCount"},
-            {"Reach"}, {"storm.benchmark.topology.Reach"},
+            {"DRPC"}, {"storm.benchmark.topology.DRPC"},
             {"RollingSort"}, {"storm.benchmark.topology.RollingSort"},
             {"SOL"}, {"storm.benchmark.topology.SOL"},
             {"TridentWordCount"}, {"storm.benchmark.topology.TridentWordCount"},

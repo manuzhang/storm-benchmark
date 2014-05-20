@@ -4,7 +4,7 @@ import backtype.storm.tuple.Fields;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.TridentMetrics;
-import storm.benchmark.trident.functions.WordSplit;
+import storm.benchmark.trident.operation.WordSplit;
 import storm.benchmark.trident.spout.TridentFileReadSpout;
 import storm.benchmark.util.Util;
 import storm.trident.TridentTopology;
