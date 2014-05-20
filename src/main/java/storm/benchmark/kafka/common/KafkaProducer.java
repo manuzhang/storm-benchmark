@@ -21,7 +21,6 @@ public abstract class KafkaProducer extends StormBenchmark {
 
   public static final String SPOUT = "spout";
   public static final String BOLT = "bolt";
-  public static final String PARTITIONS = "partitions";
   public static final String BROKER_LIST = "broker.list";
   public static final String TOPIC = "topic";
 
@@ -29,8 +28,6 @@ public abstract class KafkaProducer extends StormBenchmark {
   protected int spoutNum = 4;
   // number of boltNum to run in parallel
   protected int boltNum = 4;
-  // number of Kafka partitions
-  protected int partitions = boltNum;
 
   protected IRichSpout spout;
   protected final IRichBolt bolt = new KafkaBolt<String, String>();
@@ -44,7 +41,6 @@ public abstract class KafkaProducer extends StormBenchmark {
 
     spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
     boltNum = Util.retIfPositive(boltNum, (Integer) options.get(BOLT));
-    partitions = Util.retIfPositive(partitions, (Integer) options.get(PARTITIONS));
 
     metrics = new BasicMetrics();
 
@@ -73,4 +69,5 @@ public abstract class KafkaProducer extends StormBenchmark {
     kafkaConfig.put(KafkaBolt.TOPIC, topic);
     return kafkaConfig;
   }
+
 }

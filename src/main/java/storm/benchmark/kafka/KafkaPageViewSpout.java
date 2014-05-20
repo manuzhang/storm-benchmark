@@ -7,8 +7,8 @@ public class KafkaPageViewSpout extends KafkaProducerSpout {
   private static final long serialVersionUID = 1772211150101656352L;
   private PageViewGenerator generator;
 
-  public KafkaPageViewSpout(int partitions) {
-    super(partitions);
+  public KafkaPageViewSpout() {
+    super();
     this.generator = new PageViewGenerator();
   }
 

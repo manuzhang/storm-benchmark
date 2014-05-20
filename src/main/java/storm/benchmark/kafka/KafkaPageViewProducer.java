@@ -11,7 +11,7 @@ public class KafkaPageViewProducer extends KafkaProducer {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spout = new KafkaPageViewSpout(partitions);
+    spout = new KafkaPageViewSpout();
 
     return this;
   }

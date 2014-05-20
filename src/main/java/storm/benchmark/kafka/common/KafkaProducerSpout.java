@@ -6,10 +6,10 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import storm.benchmark.util.Util;
 import storm.kafka.bolt.KafkaBolt;
 
 import java.util.Map;
+import java.util.Random;
 
 /**
  * KafkaProducerSpout generates source data for downstream KafkaBolt to
@@ -21,12 +21,11 @@ import java.util.Map;
 public abstract class KafkaProducerSpout extends BaseRichSpout {
 
   private static final long serialVersionUID = -3823006007489002720L;
-  protected int partitions;
-  private int index;
+  private final Random random;
   protected SpoutOutputCollector collector;
 
-  public KafkaProducerSpout(int partitions) {
-    this.partitions = Util.retIfPositive(1, partitions);
+  public KafkaProducerSpout() {
+    random = new Random();
   }
 
   @Override
@@ -40,10 +39,6 @@ public abstract class KafkaProducerSpout extends BaseRichSpout {
   }
 
   protected void nextMessage(String message) {
-    if (index >= partitions) {
-      index = 0;
-    }
-    collector.emit(new Values(index + "", message));
-    index++;
+    collector.emit(new Values(random.nextInt() + "", message));
   }
 }

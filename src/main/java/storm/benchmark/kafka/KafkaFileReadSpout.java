@@ -8,8 +8,7 @@ public class KafkaFileReadSpout extends KafkaProducerSpout {
   private static final long serialVersionUID = -7503987913879480348L;
   private final FileReader reader;
 
-  public KafkaFileReadSpout(String file, int partitions) {
-    super(partitions);
+  public KafkaFileReadSpout(String file) {
     this.reader = new FileReader(file);
   }
 

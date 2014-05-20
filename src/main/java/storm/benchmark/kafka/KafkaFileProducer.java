@@ -13,7 +13,7 @@ public class KafkaFileProducer extends KafkaProducer {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spout = new KafkaFileReadSpout(FILE, partitions);
+    spout = new KafkaFileReadSpout(FILE);
     return this;
   }
 }
