@@ -3,11 +3,12 @@ package storm.benchmark.kafka.common;
 import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.utils.Utils;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
-import storm.benchmark.util.Util;
 import storm.kafka.bolt.KafkaBolt;
 
 import java.util.HashMap;
@@ -39,8 +40,8 @@ public abstract class KafkaProducer extends StormBenchmark {
     Map stormConfig = config.getStormConfig();
     stormConfig.putAll(getKafkaConfig(options));
 
-    spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
-    boltNum = Util.retIfPositive(boltNum, (Integer) options.get(BOLT));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    boltNum = BenchmarkUtils.getInt(options, BOLT, boltNum);
 
     metrics = new BasicMetrics();
 
@@ -59,8 +60,8 @@ public abstract class KafkaProducer extends StormBenchmark {
   private Map getKafkaConfig(Map options) {
     Map kafkaConfig = new HashMap();
     Map brokerConfig = new HashMap();
-    String brokers = (String) Util.retIfNotNull("localhost:9092", options.get(BROKER_LIST));
-    String topic = (String) Util.retIfNotNull(KafkaUtils.DEFAULT_TOPIC, options.get(TOPIC));
+    String brokers = (String) Utils.get(options, BROKER_LIST, "localhost:9092");
+    String topic = (String) Utils.get(options, TOPIC, KafkaUtils.DEFAULT_TOPIC);
     brokerConfig.put("metadata.broker.list", brokers);
     brokerConfig.put("serializer.class", "kafka.serializer.StringEncoder");
     brokerConfig.put("key.serializer.class", "kafka.serializer.StringEncoder");

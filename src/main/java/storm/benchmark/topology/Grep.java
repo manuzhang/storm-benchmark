@@ -13,7 +13,7 @@ import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
@@ -32,12 +32,12 @@ public class Grep extends StormBenchmark {
 
   // pattern string to grep
   protected String ptnString = "string";
-  // number of spouts to run in parallel
-  protected int spouts = 5;
+  // number of spoutNum to run in parallel
+  protected int spoutNum = 5;
   // number of matching bolts to run in parallel
-  protected int matBolts = 8;
+  protected int matBoltNum = 8;
   // number of count bolts to run in parallel
-  protected int cntBolts = 4;
+  protected int cntBoltNum = 4;
 
   protected SpoutConfig spoutConfig;
 
@@ -46,9 +46,9 @@ public class Grep extends StormBenchmark {
     options.put("patternString", ptnString);
     super.parseOptions(options);
 
-    spouts = Util.retIfPositive(spouts, (Integer) options.get(SPOUT));
-    matBolts = Util.retIfPositive(matBolts, (Integer) options.get(FM));
-    cntBolts = Util.retIfPositive(cntBolts, (Integer) options.get(CM));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    matBoltNum = BenchmarkUtils.getInt(options, FM, matBoltNum);
+    cntBoltNum = BenchmarkUtils.getInt(options, CM, cntBoltNum);
 
     spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
     metrics = new BasicMetrics();
@@ -58,10 +58,10 @@ public class Grep extends StormBenchmark {
   @Override
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
-    builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spouts);
-    builder.setBolt(FM, new FindMatchingSentence(), matBolts)
+    builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spoutNum);
+    builder.setBolt(FM, new FindMatchingSentence(), matBoltNum)
             .shuffleGrouping(SPOUT);
-    builder.setBolt(CM, new CountMatchingSentence(), cntBolts)
+    builder.setBolt(CM, new CountMatchingSentence(), cntBoltNum)
             .fieldsGrouping(FM, new Fields(WORD));
 
     topology = builder.createTopology();

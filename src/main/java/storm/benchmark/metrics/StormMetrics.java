@@ -1,5 +1,6 @@
 package storm.benchmark.metrics;
 
+import backtype.storm.Config;
 import backtype.storm.generated.Bolt;
 import backtype.storm.generated.Nimbus;
 import backtype.storm.generated.SpoutSpec;
@@ -8,8 +9,8 @@ import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
 import storm.benchmark.BenchmarkConfig;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.FileUtils;
-import storm.benchmark.util.Util;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -42,9 +43,10 @@ public abstract class StormMetrics implements IMetrics {
   public static final String SPOUT_THROUGHPUT_MB_FORMAT = "%.3f";
 
 
-  public static final int THROUGHPUT_UNIT = 1000 * 1000; // MB
   public static final String ALL_TIME = ":all-time";
   public static final String LAST_TEN_MINS = "600";
+  public static final String LAST_THREE_HOURS = "10800";
+  public static final String LAST_DAY = "86400";
 
   public static final String METRICS_CONF_FORMAT = "%s/%s_metrics_%d.conf";
   public static final String METRICS_FILE_FORMAT = "%s/%s_metrics_%d.csv";
@@ -60,8 +62,9 @@ public abstract class StormMetrics implements IMetrics {
   // default path for metrics files
   String path = "/root/";
 
-  BenchmarkConfig config;
+  Config config;
   StormTopology topology;
+  String topoName;
   Map<String, SpoutSpec> spouts;
   Map<String, Bolt> bolts;
   Map<String, String> metrics = new HashMap<String, String>();
@@ -69,14 +72,13 @@ public abstract class StormMetrics implements IMetrics {
   PrintWriter fileWriter = null;
 
   @Override
-  public IMetrics setConfig(BenchmarkConfig config) {
-    this.config = config;
-    Map cmdOpts = this.config.getCommandLineOpts();
-    this.poll = Util.retIfPositive(this.poll, (Integer) cmdOpts.get(METRICS_POLL_FREQ));
-    this.total = Util.retIfPositive(this.total, (Integer) cmdOpts.get(METRICS_TOTAL_TIME));
-    this.msgSize = Util.retIfPositive(this.msgSize, (Integer) cmdOpts.get(BenchmarkConfig.MESSAGE_SIZE));
-    this.path = (String) Util.retIfNotNull(this.path, cmdOpts.get(METRICS_PATH));
-    final String topoName = this.config.getTopologyName();
+  public IMetrics setConfig(BenchmarkConfig benchConfig) {
+    this.config = benchConfig.getStormConfig();
+    poll = BenchmarkUtils.getInt(config, METRICS_POLL_FREQ, poll);
+    total = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, total);
+    msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, msgSize);
+    path = (String) Utils.get(config, METRICS_PATH, path);
+    topoName = benchConfig.getTopologyName();
     final long time = System.currentTimeMillis();
     final String confName = String.format(METRICS_CONF_FORMAT, this.path, topoName, time);
     final String fileName = String.format(METRICS_FILE_FORMAT, this.path, topoName, time);
@@ -95,15 +97,14 @@ public abstract class StormMetrics implements IMetrics {
 
   public Nimbus.Client getNimbusClient() {
     Map clusterConf = Utils.readStormConfig();
-    clusterConf.putAll(config.getStormConfig());
+    clusterConf.putAll(config);
     return NimbusClient.getConfiguredClient(clusterConf).getClient();
   }
 
-  public void writeOutCommandLineOpts(PrintWriter writer) {
-    Map opts = config.getCommandLineOpts();
+  public void writeOutStormConfig(PrintWriter writer) {
     if (writer != null) {
-      for (Object key : opts.keySet()) {
-        writer.println(key + "=" + opts.get(key));
+      for (Object key : config.keySet()) {
+        writer.println(key + "=" + config.get(key));
       }
     }
   }

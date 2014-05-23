@@ -8,7 +8,7 @@ import storm.benchmark.StormBenchmark;
 import storm.benchmark.bolt.PageViewBolt;
 import storm.benchmark.bolt.UniqueVisitorBolt;
 import storm.benchmark.util.KafkaUtils;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
@@ -40,11 +40,11 @@ public class KafkaUniqueVisitor extends StormBenchmark {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
-    pvBoltNum = Util.retIfPositive(pvBoltNum, (Integer) options.get(VIEW));
-    uvBoltNum = Util.retIfPositive(uvBoltNum, (Integer) options.get(UNIQUER));
-    winLen = Util.retIfPositive(winLen, (Integer) options.get(WINDOW_LENGTH));
-    emitFreq = Util.retIfPositive(emitFreq, (Integer) options.get(EMIT_FREQ));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    pvBoltNum = BenchmarkUtils.getInt(options, VIEW, pvBoltNum);
+    uvBoltNum = BenchmarkUtils.getInt(options, UNIQUER, uvBoltNum);
+    winLen = BenchmarkUtils.getInt(options, WINDOW_LENGTH, winLen);
+    emitFreq = BenchmarkUtils.getInt(options, EMIT_FREQ, emitFreq);
     spoutConfig = KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme()));
     return this;
   }

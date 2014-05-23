@@ -2,14 +2,14 @@ package storm.benchmark;
 
 import backtype.storm.Config;
 import org.apache.log4j.Logger;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * BenchmarkConfig holds Storm config and Benchmark options
- * It also provides default values to config if not set by user
+ * BenchmarkConfig is a wrapper over Storm config
+ * It provides default values to config if not set by user
  */
 public class BenchmarkConfig {
   public static final String METRICS_CONSUMER = "metrics.consumer";
@@ -33,31 +33,21 @@ public class BenchmarkConfig {
   // default size for worker transfer buffer
   public static final int DEFAULT_WTBSIZE = 32;
 
-  private final Config config;
-  private final Map options;
+  private final Config config = new Config();
 
   private static final Logger LOG = Logger.getLogger(BenchmarkConfig.class);
 
   public BenchmarkConfig() {
-    this(new Config(), new HashMap());
+    this(new HashMap());
   }
+
 
   public BenchmarkConfig(Map options) {
-    this(new Config(), options);
-  }
-
-  public BenchmarkConfig(Config  config, Map options) {
-    this.config = config;
-    this.options = options;
-    checkAndSetDefault(options);
+    config.putAll(checkAndSetDefault(options));
   }
 
   public Config getStormConfig() {
-    return config;
-  }
-
-  public Map getCommandLineOpts() {
-    return options;
+    return new Config();
   }
 
   public String getTopologyName() {
@@ -65,32 +55,30 @@ public class BenchmarkConfig {
   }
 
   public Boolean ifAckEnabled() {
-    return (Integer)config.get(Config.TOPOLOGY_ACKER_EXECUTORS) > 0;
+    return (Integer) config.get(Config.TOPOLOGY_ACKER_EXECUTORS) > 0;
   }
 
-  private void checkAndSetDefault(Map options) {
-    Util.putIfAbsent(options, Config.TOPOLOGY_NAME, DEFAULT_TOPOLOGY_NAME);
-    Util.putIfAbsent(options, Config.TOPOLOGY_DEBUG, ENABLE_DEBUG);
-    Util.putIfAbsent(options, Config.TOPOLOGY_WORKERS, DEFAULT_WORKERS);
-    Util.putIfAbsent(options, Config.TOPOLOGY_ACKER_EXECUTORS, DEFAULT_EXECUTORS);
-    Util.putIfAbsent(options, Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, DEFAULT_ERBSIZE);
-    Util.putIfAbsent(options, Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, DEFAULT_ESBSIZE);
-    Util.putIfAbsent(options, Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, DEFAULT_WRBSIZE);
-    Util.putIfAbsent(options, Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, DEFAULT_WTBSIZE);
+  private Map checkAndSetDefault(Map options) {
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_NAME, DEFAULT_TOPOLOGY_NAME);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_DEBUG, ENABLE_DEBUG);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_WORKERS, DEFAULT_WORKERS);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_ACKER_EXECUTORS, DEFAULT_EXECUTORS);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, DEFAULT_ERBSIZE);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, DEFAULT_ESBSIZE);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, DEFAULT_WRBSIZE);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, DEFAULT_WTBSIZE);
 
 
     if (options.containsKey(METRICS_CONSUMER)) {
       try {
         Class consumer =
-              Class.forName((String) options.remove(METRICS_CONSUMER));
-        int parallel = Util.retIfPositive(1,
-                (Integer) options.remove(METRICS_CONSUMER_PARALLELISM));
+              Class.forName((String) options.get(METRICS_CONSUMER));
+        int parallel = BenchmarkUtils.getInt(options, METRICS_CONSUMER_PARALLELISM, 1);
         config.registerMetricsConsumer(consumer, parallel);
       } catch (ClassNotFoundException e) {
         LOG.error(e.getMessage());
       }
     }
-
-    config.putAll(options);
+    return options;
   }
 }

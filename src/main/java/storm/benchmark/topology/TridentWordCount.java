@@ -6,7 +6,7 @@ import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.TridentMetrics;
 import storm.benchmark.trident.operation.WordSplit;
 import storm.benchmark.trident.spout.TridentFileReadSpout;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.trident.TridentTopology;
 import storm.trident.operation.builtin.Count;
 import storm.trident.testing.MemoryMapState;
@@ -22,23 +22,21 @@ public class TridentWordCount extends StormBenchmark {
   private static final String COUNT = "count1";
 
   private int maxBatchSize = 3;
-  // number of spouts to run in parallel
-  private int spouts = 8;
-  // number of splits to run in parallel
-  private int splits = 4;
-  // number of counts to run in parallel
-  private int counts = 4;
+  // number of spoutNum to run in parallel
+  private int spoutNum = 8;
+  // number of splitNum to run in parallel
+  private int splitNum = 4;
+  // number of countNum to run in parallel
+  private int countNum = 4;
 
   @Override
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
-     if (options.containsKey(MAX_BATCH_SIZE)) {
-      maxBatchSize = Util.retIfPositive(maxBatchSize, (Integer) options.get(MAX_BATCH_SIZE));
-    }
+    maxBatchSize = BenchmarkUtils.getInt(options, MAX_BATCH_SIZE, maxBatchSize);
 
-    spouts = Util.retIfPositive(spouts, (Integer) options.get(SPOUT));
-    splits = Util.retIfPositive(splits, (Integer) options.get(SPLIT));
-    counts = Util.retIfPositive(counts, (Integer) options.get(COUNT));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    splitNum = BenchmarkUtils.getInt(options, SPLIT, splitNum);
+    countNum = BenchmarkUtils.getInt(options, COUNT, countNum);
 
     metrics = new TridentMetrics();
 
@@ -52,10 +50,10 @@ public class TridentWordCount extends StormBenchmark {
     TridentFileReadSpout spout = new TridentFileReadSpout(new Fields("sentence"), maxBatchSize);
 
     TridentTopology trident = new TridentTopology();
-    trident.newStream(SPOUT, spout).parallelismHint(spouts)
-      .each(new Fields("sentence"), new WordSplit(), new Fields("word")).parallelismHint(splits)
+    trident.newStream(SPOUT, spout)
+      .each(new Fields("sentence"), new WordSplit(), new Fields("word"))
       .groupBy(new Fields("word"))
-      .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("count")).parallelismHint(counts);
+      .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("count")).parallelismHint(countNum);
 
     topology = trident.build();
 

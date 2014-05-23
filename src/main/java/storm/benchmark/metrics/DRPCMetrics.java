@@ -8,8 +8,8 @@ package storm.benchmark.metrics;
  */
 
 import backtype.storm.utils.DRPCClient;
+import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
-import storm.benchmark.util.Util;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class DRPCMetrics extends StormMetrics {
 
   private void writeConf() {
     confWriter.println(String.format("drpc.function = %s", function));
-    confWriter.println(String.format("drpc.args = {%s}", Util.join(args, ",")));
+    confWriter.println(String.format("drpc.args = {%s}", Utils.join(args, ",")));
     confWriter.println(String.format("drpc.server = %s", server));
     confWriter.println(String.format("drpc.port = %s", port));
     confWriter.close();

@@ -1,22 +1,20 @@
 package storm.benchmark.metrics;
 
 import backtype.storm.generated.*;
+import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.MetricsUtils;
+import storm.benchmark.util.BenchmarkUtils;
 
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BasicMetrics extends StormMetrics {
 
   private static final Logger LOG = Logger.getLogger(BasicMetrics.class);
 
-  private static final String SPOUT_AVG_LATENCY_FORMAT = "%.1f";
-  private static final String SPOUT_MAX_LATENCY_FORMAT = "%.1f";
-  private static final String STREAM = "default";
+  static final String SPOUT_AVG_LATENCY_FORMAT = "%.1f";
+  static final String SPOUT_MAX_LATENCY_FORMAT = "%.1f";
 
   private List<String> header = new LinkedList<String>();
 
@@ -28,7 +26,7 @@ public class BasicMetrics extends StormMetrics {
     state.startTime = now;
     state.lastTime = now;
 
-    writeOutCommandLineOpts(confWriter);
+    writeOutStormConfig(confWriter);
     writeHeader(fileWriter);
     Nimbus.Client client = getNimbusClient();
 
@@ -36,7 +34,7 @@ public class BasicMetrics extends StormMetrics {
       boolean live = true;
       while (live && now < endTime) {
         live = pollNimbus(client, now, state, fileWriter);
-        Thread.sleep(poll);
+        Utils.sleep(poll);
         now = System.currentTimeMillis();
       }
     } catch (Exception e) {
@@ -49,14 +47,13 @@ public class BasicMetrics extends StormMetrics {
   }
 
 
-  private boolean pollNimbus(Nimbus.Client client, long now, MetricsState state, PrintWriter writer)
+  boolean pollNimbus(Nimbus.Client client, long now, MetricsState state, PrintWriter writer)
     throws Exception {
-    final String name = config.getTopologyName();
     ClusterSummary cs = client.getClusterInfo();
     if (null == cs) {
       return false;
     }
-    TopologySummary ts = getTopologySummary(cs, name);
+    TopologySummary ts = MetricsUtils.getTopologySummary(cs, topoName);
     if (null == ts) {
       return false;
     }
@@ -88,23 +85,22 @@ public class BasicMetrics extends StormMetrics {
     TopologyInfo info = client.getTopologyInfo(ts.get_id());
     for (ExecutorSummary es : info.get_executors()) {
       String id = es.get_component_id();
-      // filter out acker and metrics stats
-      if (id.startsWith("__acker") || id.startsWith("_metrics")) {
+      if (Utils.isSystemId(id)) {
         continue;
       }
       ExecutorStats exeStats = es.get_stats();
       if (exeStats != null) {
         executorsWithMetircs++;
-        long transferred = getTransferred(exeStats);
+        long transferred = MetricsUtils.getTransferred(exeStats, ALL_TIME, Utils.DEFAULT_STREAM_ID);
         overallTransferred += transferred;
         ExecutorSpecificStats specs = exeStats.get_specific();
         if (specs != null && specs.is_set_spout()) {
           spoutExecutors++;
           spoutTransferred += transferred;
           SpoutStats spStats = specs.get_spout();
-          double lat = getSpoutCompleteLatency(spStats, ALL_TIME, STREAM);
-          spoutAcked += getSpoutAcked(spStats, ALL_TIME, STREAM);
-          updateLatency(id, lat, comLat);
+          spoutAcked += MetricsUtils.getSpoutAcked(spStats, ALL_TIME, Utils.DEFAULT_STREAM_ID);
+          double lat = MetricsUtils.getSpoutCompleteLatency(spStats, ALL_TIME, Utils.DEFAULT_STREAM_ID);
+          MetricsUtils.addLatency(comLat, id, lat);
         }
       }
     }
@@ -114,10 +110,10 @@ public class BasicMetrics extends StormMetrics {
     long timeDiff = now - state.lastTime;
     long overallDiff = overallTransferred - state.overallTransferred;
     long spoutDiff = spoutTransferred - state.spoutTransferred;
-    long throughput = (long) getThroughput(overallDiff, timeDiff);
-    double throughputMB = (long) getThroughputMB(overallDiff, timeDiff);
-    long spoutThroughput = (long) getThroughput(spoutDiff, timeDiff);
-    double spoutThroughputMB = (long) getThroughputMB(spoutDiff, timeDiff);
+    long throughput = (long) MetricsUtils.getThroughput(overallDiff, timeDiff);
+    double throughputMB = (long) MetricsUtils.getThroughputMB(overallDiff, timeDiff, msgSize);
+    long spoutThroughput = (long) MetricsUtils.getThroughput(spoutDiff, timeDiff);
+    double spoutThroughputMB = (long) MetricsUtils.getThroughputMB(spoutDiff, timeDiff, msgSize);
     metrics.put(TRANSFERRED, Long.toString(overallDiff));
     metrics.put(THROUGHPUT, Long.toString(throughput));
     metrics.put(THROUGHPUT_MB, String.format(THROUGHPUT_MB_FORMAT, throughputMB));
@@ -129,11 +125,11 @@ public class BasicMetrics extends StormMetrics {
 
     for (String id : spouts.keySet()) {
       List<Double> lats = comLat.get(id);
-      double avg = null == lats ? 0.0 : Util.avg(lats);
-      double max = null == lats ? 0.0 : Util.max(lats);
-      metrics.put(SPOUT_AVG_COMPELETE_LATENCY(id),
+      double avg = null == lats ? 0.0 : BenchmarkUtils.avg(lats);
+      double max = null == lats ? 0.0 : BenchmarkUtils.max(lats);
+      metrics.put(MetricsUtils.getSpoutMaxCompleteLatencyTitle(id),
               String.format(SPOUT_AVG_LATENCY_FORMAT, avg));
-      metrics.put(SPOUT_MAX_COMPELETE_LATENCY(id),
+      metrics.put(MetricsUtils.getSpoutAvgCompleteLatencyTitle(id),
               String.format(SPOUT_MAX_LATENCY_FORMAT, max));
     }
 
@@ -145,80 +141,7 @@ public class BasicMetrics extends StormMetrics {
     return true;
   }
 
-  private TopologySummary getTopologySummary(ClusterSummary cs, String name) {
-    for (TopologySummary ts : cs.get_topologies()) {
-      if (name.equals(ts.get_name())) {
-        return ts;
-      }
-    }
-    return null;
-  }
-
-  private double getSpoutCompleteLatency(SpoutStats stats, String window, String stream) {
-    Map<String, Map<String, Double>> latAll = stats.get_complete_ms_avg();
-    if (latAll != null) {
-      // latency in a time window
-      Map<String, Double> latWin = latAll.get(window);
-      if (latWin != null) {
-        // latency in a stream
-        Double latStr = latWin.get(stream);
-        if (latStr != null) {
-          return latStr;
-        }
-      }
-    }
-    return 0.0;
-  }
-
-  private long getSpoutAcked(SpoutStats stats, String window, String stream) {
-    Map<String, Map<String, Long>> ackedAll = stats.get_acked();
-    if (ackedAll != null) {
-      Map<String, Long> ackedWin = ackedAll.get(window);
-      if (ackedWin != null) {
-        Long ackedStr = ackedWin.get(stream);
-        if (ackedStr != null) {
-          return ackedStr;
-        }
-      }
-    }
-    return 0;
-  }
-
-  private long getTransferred(ExecutorStats stats) {
-    Map<String, Map<String, Long>> transAll = stats.get_transferred();
-    if (transAll != null) {
-      Map<String, Long> transWin = transAll.get(ALL_TIME);
-      if (transWin != null) {
-        Long transStr = transWin.get(STREAM);
-        if (transStr != null) {
-          return transStr;
-        }
-      }
-    }
-    return 0;
-  }
-
-  // messages per second
-  private double getThroughput(long throughputDiff, long timeDiff) {
-    return (0 == timeDiff) ? 0.0 : throughputDiff / (timeDiff / 1000.0);
-  }
-
-  // MB per second
-  private double getThroughputMB(long throughputDiff, long timeDiff) {
-    return (0 == timeDiff) ? 0.0 : (throughputDiff * msgSize) / (timeDiff / 1000.0) / THROUGHPUT_UNIT;
-  }
-
-  private void updateLatency(String id, double lat, Map<String, List<Double>> stats) {
-    if (stats.containsKey(id)) {
-      stats.get(id).add(lat);
-    } else {
-      List<Double> list = new LinkedList<Double>();
-      list.add(lat);
-      stats.put(id, list);
-    }
-  }
-
-  private void writeHeader(PrintWriter writer) {
+  void writeHeader(PrintWriter writer) {
     header.add(TIME);
     header.add(TOTAl_SLOTS);
     header.add(USED_SLOTS);
@@ -235,34 +158,21 @@ public class BasicMetrics extends StormMetrics {
     header.add(SPOUT_THROUGHPUT);
     header.add(SPOUT_THROUGHPUT_MB);
     for (String id : spouts.keySet()) {
-      header.add(SPOUT_AVG_COMPELETE_LATENCY(id));
-      header.add(SPOUT_MAX_COMPELETE_LATENCY(id));
+      header.add(MetricsUtils.getSpoutAvgCompleteLatencyTitle(id));
+      header.add(MetricsUtils.getSpoutMaxCompleteLatencyTitle(id));
     }
-    writer.println(Util.join(header, ","));
+    writer.println(Utils.join(header, ","));
     writer.flush();
   }
 
-  private void writeLine(PrintWriter writer) {
+  void writeLine(PrintWriter writer) {
     List<String> line = new LinkedList<String>();
     for (String h : header) {
       line.add(metrics.get(h));
     }
-    writer.println(Util.join(line, ","));
+    writer.println(Utils.join(line, ","));
     writer.flush();
   }
 
-  private String SPOUT_AVG_COMPELETE_LATENCY(String id) {
-    return id + "_avg_complete_latency(ms)";
-  }
 
-  private String SPOUT_MAX_COMPELETE_LATENCY(String id) {
-    return id + "_max_complete_lantency(ms)";
-  }
-
-  private static class MetricsState {
-    long overallTransferred = 0;
-    long spoutTransferred = 0;
-    long lastTime = 0;
-    long startTime = 0;
-  }
 }

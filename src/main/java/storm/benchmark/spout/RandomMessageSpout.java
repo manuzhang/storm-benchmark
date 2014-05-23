@@ -22,7 +22,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import storm.benchmark.util.Util;
 
 import java.util.Map;
 import java.util.Random;
@@ -38,7 +37,7 @@ public class RandomMessageSpout extends BaseRichSpout {
   private Random rand = null;
 
   public RandomMessageSpout(int sizeInBytes, boolean ackEnabled) {
-    this.sizeInBytes = Util.retIfPositive(0, sizeInBytes);
+    this.sizeInBytes = sizeInBytes;
     this.messageCount = 0;
     this.ackEnabled = ackEnabled;
   }

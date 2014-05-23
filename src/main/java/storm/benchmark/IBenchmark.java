@@ -10,7 +10,7 @@ import java.util.Map;
 public interface IBenchmark {
   /**
    *
-   * @param options from command line (set with "-c")
+   * @param options storm.yaml + command line (set with "-c")
    * @return
    */
   public IBenchmark parseOptions(Map options);

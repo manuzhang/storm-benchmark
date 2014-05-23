@@ -7,7 +7,7 @@ import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.bolt.FilterBolt;
 import storm.benchmark.bolt.PageViewBolt;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
@@ -37,10 +37,10 @@ public class DataClean extends StormBenchmark {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
-    pvBoltNum = Util.retIfPositive(pvBoltNum, (Integer) options.get(VIEW));
-    filtBoltNum = Util.retIfPositive(filtBoltNum, (Integer) options.get(FILTER));
-    emitFreq = Util.retIfPositive(emitFreq, (Integer) options.get(EMIT_FREQ));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    pvBoltNum = BenchmarkUtils.getInt(options, VIEW, pvBoltNum);
+    filtBoltNum = BenchmarkUtils.getInt(options, FILTER, filtBoltNum);
+    emitFreq = BenchmarkUtils.getInt(options, EMIT_FREQ, emitFreq);
     spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
     return this;
   }

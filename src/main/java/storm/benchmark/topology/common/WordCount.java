@@ -13,7 +13,7 @@ import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.trident.operation.WordSplit;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +36,9 @@ public abstract class WordCount extends StormBenchmark {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
-    spBoltNum = Util.retIfPositive(spBoltNum, (Integer) options.get(SPLIT));
-    cntBoltNum = Util.retIfPositive(cntBoltNum, (Integer) options.get(COUNT));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    spBoltNum = BenchmarkUtils.getInt(options, SPLIT, spBoltNum);
+    cntBoltNum = BenchmarkUtils.getInt(options, COUNT, cntBoltNum);
 
     metrics = new BasicMetrics();
 

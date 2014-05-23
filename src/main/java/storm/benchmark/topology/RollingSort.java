@@ -7,7 +7,7 @@ import storm.benchmark.StormBenchmark;
 import storm.benchmark.bolt.RollingCountBolt;
 import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.spout.FileReadSpout;
-import storm.benchmark.util.Util;
+import storm.benchmark.util.BenchmarkUtils;
 
 import java.util.Map;
 
@@ -22,11 +22,11 @@ public class RollingSort extends StormBenchmark {
   private static final String IR = "intermediateRanker";
   private static final String TR = "finalRanker";
 
-  // number of spouts to run in parallel
-  protected int spouts = 4;
+  // number of spoutNum to run in parallel
+  protected int spoutNum = 4;
 
   // number of rolling count bolts to run in parallel
-  protected int rcBolts = 8;
+  protected int rcBoltNum = 8;
 
   // window length in seconds
   protected int winLen = 9;
@@ -39,10 +39,10 @@ public class RollingSort extends StormBenchmark {
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
 
-    spouts = Util.retIfPositive(spouts, (Integer) options.get(SPOUT));
-    rcBolts = Util.retIfPositive(rcBolts, (Integer) options.get(COUNTER));
-    winLen = Util.retIfPositive(winLen, (Integer) options.get(WINDOW_LENGTH));
-    emitFreq = Util.retIfPositive(emitFreq, (Integer)options.get(EMIT_FREQ));
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
+    rcBoltNum = BenchmarkUtils.getInt(options, COUNTER, rcBoltNum);
+    winLen = BenchmarkUtils.getInt(options, WINDOW_LENGTH, winLen);
+    emitFreq = BenchmarkUtils.getInt(options, EMIT_FREQ, emitFreq);
 
     metrics = new BasicMetrics();
 
@@ -53,8 +53,8 @@ public class RollingSort extends StormBenchmark {
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
 
-    builder.setSpout(SPOUT, new FileReadSpout(), spouts);
-    builder.setBolt(COUNTER, new RollingCountBolt(winLen, emitFreq), rcBolts).fieldsGrouping(SPOUT, new Fields("word"));
+    builder.setSpout(SPOUT, new FileReadSpout(), spoutNum);
+    builder.setBolt(COUNTER, new RollingCountBolt(winLen, emitFreq), rcBoltNum).fieldsGrouping(SPOUT, new Fields("word"));
     topology = builder.createTopology();
     return this;
   }
