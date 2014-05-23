@@ -12,7 +12,6 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
@@ -51,7 +50,6 @@ public class Grep extends StormBenchmark {
     cntBoltNum = BenchmarkUtils.getInt(options, CM, cntBoltNum);
 
     spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-    metrics = new BasicMetrics();
 
     return this;
   }

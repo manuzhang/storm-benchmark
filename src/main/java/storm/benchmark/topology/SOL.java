@@ -5,7 +5,6 @@ import storm.benchmark.BenchmarkConfig;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.bolt.ConstBolt;
-import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.spout.RandomMessageSpout;
 import storm.benchmark.util.BenchmarkUtils;
 
@@ -34,8 +33,6 @@ public class SOL extends StormBenchmark {
     msgSize = BenchmarkUtils.getInt(options, BenchmarkConfig.MESSAGE_SIZE, msgSize);
     spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
     boltNum = BenchmarkUtils.getInt(options, BOLT, boltNum);
-
-    metrics = new BasicMetrics();
 
     return this;
   }

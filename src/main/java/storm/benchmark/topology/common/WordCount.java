@@ -11,7 +11,6 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.trident.operation.WordSplit;
 import storm.benchmark.util.BenchmarkUtils;
 
@@ -39,8 +38,6 @@ public abstract class WordCount extends StormBenchmark {
     spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
     spBoltNum = BenchmarkUtils.getInt(options, SPLIT, spBoltNum);
     cntBoltNum = BenchmarkUtils.getInt(options, COUNT, cntBoltNum);
-
-    metrics = new BasicMetrics();
 
     return this;
   }

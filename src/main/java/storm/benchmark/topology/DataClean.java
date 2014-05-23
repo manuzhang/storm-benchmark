@@ -42,6 +42,7 @@ public class DataClean extends StormBenchmark {
     filtBoltNum = BenchmarkUtils.getInt(options, FILTER, filtBoltNum);
     emitFreq = BenchmarkUtils.getInt(options, EMIT_FREQ, emitFreq);
     spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+
     return this;
   }
 

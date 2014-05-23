@@ -3,7 +3,6 @@ package storm.benchmark.topology;
 import backtype.storm.tuple.Fields;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.metrics.TridentMetrics;
 import storm.benchmark.trident.operation.WordSplit;
 import storm.benchmark.trident.spout.TridentFileReadSpout;
 import storm.benchmark.util.BenchmarkUtils;
@@ -37,8 +36,6 @@ public class TridentWordCount extends StormBenchmark {
     spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
     splitNum = BenchmarkUtils.getInt(options, SPLIT, splitNum);
     countNum = BenchmarkUtils.getInt(options, COUNT, countNum);
-
-    metrics = new TridentMetrics();
 
     return this;
   }

@@ -6,7 +6,6 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.utils.Utils;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.bolt.KafkaBolt;
@@ -42,8 +41,6 @@ public abstract class KafkaProducer extends StormBenchmark {
 
     spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
     boltNum = BenchmarkUtils.getInt(options, BOLT, boltNum);
-
-    metrics = new BasicMetrics();
 
     return this;
   }

@@ -1,8 +1,10 @@
 package storm.benchmark;
 
 import backtype.storm.StormSubmitter;
-import backtype.storm.generated.*;
+import backtype.storm.generated.InvalidTopologyException;
+import backtype.storm.generated.StormTopology;
 import storm.benchmark.metrics.IMetrics;
+import storm.benchmark.metrics.StormMetrics;
 
 import java.util.Map;
 
@@ -17,6 +19,7 @@ public abstract class StormBenchmark implements IBenchmark {
     if (options != null) {
       config = new BenchmarkConfig(options);
     }
+    metrics = new StormMetrics();
     return this;
   }
 

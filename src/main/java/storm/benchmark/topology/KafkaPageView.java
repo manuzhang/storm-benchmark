@@ -6,10 +6,9 @@ import backtype.storm.tuple.Fields;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.bolt.PageViewBolt;
-import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.topology.common.WordCount;
-import storm.benchmark.util.KafkaUtils;
 import storm.benchmark.util.BenchmarkUtils;
+import storm.benchmark.util.KafkaUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
@@ -37,7 +36,7 @@ public class KafkaPageView  extends StormBenchmark {
     cntBoltNum = BenchmarkUtils.getInt(options, COUNT, cntBoltNum);
 
     spoutConfig = KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme()));
-    metrics = new BasicMetrics();
+
     return this;
   }
 

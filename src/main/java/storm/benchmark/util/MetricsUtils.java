@@ -14,7 +14,6 @@ public class MetricsUtils {
   private static final int MB = 1000 * 1000;
 
   private MetricsUtils() {
-
   }
 
   public static void addLatency(Map<String, List<Double>> stats, String id, double lat) {

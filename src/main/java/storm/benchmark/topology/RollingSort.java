@@ -5,7 +5,6 @@ import backtype.storm.tuple.Fields;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.bolt.RollingCountBolt;
-import storm.benchmark.metrics.BasicMetrics;
 import storm.benchmark.spout.FileReadSpout;
 import storm.benchmark.util.BenchmarkUtils;
 
@@ -43,8 +42,6 @@ public class RollingSort extends StormBenchmark {
     rcBoltNum = BenchmarkUtils.getInt(options, COUNTER, rcBoltNum);
     winLen = BenchmarkUtils.getInt(options, WINDOW_LENGTH, winLen);
     emitFreq = BenchmarkUtils.getInt(options, EMIT_FREQ, emitFreq);
-
-    metrics = new BasicMetrics();
 
     return this;
   }
