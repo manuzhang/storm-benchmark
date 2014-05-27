@@ -51,11 +51,19 @@ public class BenchmarkConfig {
   }
 
   public String getTopologyName() {
-    return (String) config.get(Config.TOPOLOGY_NAME);
+    Object name = config.get(Config.TOPOLOGY_NAME);
+    if (null == name) {
+      throw new RuntimeException("topology name is null");
+    }
+    return (String) name;
   }
 
   public Boolean ifAckEnabled() {
-    return (Integer) config.get(Config.TOPOLOGY_ACKER_EXECUTORS) > 0;
+    Object ackers = config.get(Config.TOPOLOGY_ACKER_EXECUTORS);
+    if (null == ackers) {
+      throw new RuntimeException("acker executors are null");
+    }
+    return (Integer) ackers > 0;
   }
 
   private Map checkAndSetDefault(Map options) {
