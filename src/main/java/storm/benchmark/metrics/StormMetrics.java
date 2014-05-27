@@ -11,10 +11,7 @@ import storm.benchmark.util.FileUtils;
 import storm.benchmark.util.MetricsUtils;
 
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StormMetrics implements IMetrics {
   private static final Logger LOG = Logger.getLogger(StormMetrics.class);
@@ -69,7 +66,7 @@ public class StormMetrics implements IMetrics {
   // metrics file path
   String path;
 
-  Config config;
+  Map config;
   StormTopology topology;
   String topoName;
   List<String> header = new LinkedList<String>();
@@ -77,8 +74,8 @@ public class StormMetrics implements IMetrics {
 
   @Override
   public IMetrics setConfig(BenchmarkConfig benchConfig) {
-    config = benchConfig.getStormConfig();
-    topoName = benchConfig.getTopologyName();
+    config = Utils.readStormConfig();
+    topoName = (String) Utils.get(config, Config.TOPOLOGY_NAME, BenchmarkConfig.DEFAULT_TOPOLOGY_NAME);
     pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_FREQ, DEFAULT_POLL_INTERVAL);
     totalTime = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, DEFAULT_TOTAL_TIME);
     msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, DEFAULT_MESSAGE_SIZE);
@@ -117,7 +114,7 @@ public class StormMetrics implements IMetrics {
         now = System.currentTimeMillis();
       }
     } catch (Exception e) {
-      LOG.error("BasicMetrics failed! ", e);
+      LOG.error("storm metrics failed! ", e);
     } finally {
       dataWriter.close();
       confWriter.close();
@@ -126,14 +123,15 @@ public class StormMetrics implements IMetrics {
   }
 
   public Nimbus.Client getNimbusClient() {
-    Map clusterConf = Utils.readStormConfig();
-    clusterConf.putAll(config);
-    return NimbusClient.getConfiguredClient(clusterConf).getClient();
+    return NimbusClient.getConfiguredClient(config).getClient();
   }
 
   public void writeStormConfig(PrintWriter writer) {
+    LOG.info("writing out storm config into .conf file");
     if (writer != null) {
-      for (Object key : config.keySet()) {
+      Map sorted = new TreeMap();
+      sorted.putAll(config);
+      for (Object key : sorted.keySet()) {
         writer.println(key + "=" + config.get(key));
       }
       writer.flush();
@@ -144,17 +142,21 @@ public class StormMetrics implements IMetrics {
           throws Exception {
     ClusterSummary cs = client.getClusterInfo();
     if (null == cs) {
+      LOG.error("ClusterSummary not found");
       return false;
     }
+
     updateSupervisorStats(cs);
 
     TopologySummary ts = MetricsUtils.getTopologySummary(cs, topoName);
     if (null == ts) {
-      throw new RuntimeException("TopologySummary not found for " + topoName);
+      LOG.error("TopologySummary not found for " + topoName);
+      return false;
     }
+
     updateTopologyStats(ts, state, now);
     TopologyInfo info = client.getTopologyInfo(ts.get_id());
-    boolean firstTime = now == state.startTime;
+    boolean firstTime = (now == state.startTime);
     updateExecutorStats(info, state, now, firstTime);
 
     if (firstTime) {
@@ -199,7 +201,9 @@ public class StormMetrics implements IMetrics {
     Map<String, List<Double>> comLat = new HashMap<String, List<Double>>();
     for (ExecutorSummary es : info.get_executors()) {
       String id = es.get_component_id();
+      LOG.debug("get stats for component: " + id);
       if (Utils.isSystemId(id)) {
+        LOG.debug("skip system component: " + id);
         continue;
       }
       ExecutorStats exeStats = es.get_stats();
@@ -207,11 +211,12 @@ public class StormMetrics implements IMetrics {
         ExecutorSpecificStats specs = exeStats.get_specific();
         ComponentCommon common = Utils.getComponentCommon(topology, id);
         for (String stream : common.get_streams().keySet()) {
+          LOG.debug("get stream " + stream + " for component " + id);
           executorsWithMetircs++;
           long transferred = MetricsUtils.getTransferred(exeStats, ALL_TIME, stream);
           overallTransferred += transferred;
           if (isSpout(specs)) {
-            if (isDefaultStream(id) || isBatchStream(id)) {
+            if (isDefaultStream(stream) || isBatchStream(stream)) {
               spoutExecutors++;
               spoutTransferred += transferred;
               SpoutStats spStats = specs.get_spout();
@@ -226,6 +231,8 @@ public class StormMetrics implements IMetrics {
             }
           }
         }
+      } else {
+        LOG.error("executor stats not found for component id: " + id );
       }
     }
     for (String id : comLat.keySet()) {
@@ -268,12 +275,12 @@ public class StormMetrics implements IMetrics {
     return specs != null && specs.is_set_spout();
   }
 
-  boolean isDefaultStream(String id) {
-    return id.equals(Utils.DEFAULT_STREAM_ID);
+  boolean isDefaultStream(String stream) {
+    return stream.equals(Utils.DEFAULT_STREAM_ID);
   }
 
-  boolean isBatchStream(String id) {
-    return id.equals("batch");
+  boolean isBatchStream(String stream) {
+    return stream.equals("batch");
   }
 
   void addHeaders() {
@@ -295,12 +302,13 @@ public class StormMetrics implements IMetrics {
   }
 
   void writeHeader(PrintWriter writer) {
-
+    LOG.info("writing out headers into .csv file");
     writer.println(Utils.join(header, ","));
     writer.flush();
   }
 
   void writeLine(PrintWriter writer) {
+    LOG.info("writing out one line data into .csv file");
     List<String> line = new LinkedList<String>();
     for (String h : header) {
       line.add(metrics.get(h));
