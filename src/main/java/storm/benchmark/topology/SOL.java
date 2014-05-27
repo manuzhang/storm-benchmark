@@ -10,7 +10,7 @@ import storm.benchmark.util.BenchmarkUtils;
 
 import java.util.Map;
 
-/*
+/**
  * forked from https://github.com/yahoo/storm-perf-test
  */
 
