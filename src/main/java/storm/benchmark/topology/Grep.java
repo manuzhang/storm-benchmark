@@ -58,7 +58,7 @@ public class Grep extends StormBenchmark {
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spoutNum);
     builder.setBolt(FM, new FindMatchingSentence(), matBoltNum)
-            .shuffleGrouping(SPOUT);
+            .localOrShuffleGrouping(SPOUT);
     builder.setBolt(CM, new CountMatchingSentence(), cntBoltNum)
             .fieldsGrouping(FM, new Fields(WORD));
 

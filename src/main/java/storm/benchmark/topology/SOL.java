@@ -43,10 +43,10 @@ public class SOL extends StormBenchmark {
 
     builder.setSpout(SPOUT, new RandomMessageSpout(msgSize, config.ifAckEnabled()), spoutNum);
     builder.setBolt(BOLT + 1, new ConstBolt(), boltNum)
-      .shuffleGrouping(SPOUT);
+      .localOrShuffleGrouping(SPOUT);
     for (int levelNum = 2; levelNum <= numLevels - 1; levelNum++) {
       builder.setBolt(BOLT + levelNum, new ConstBolt(), boltNum)
-        .shuffleGrouping(BOLT + (levelNum - 1));
+        .localOrShuffleGrouping(BOLT + (levelNum - 1));
     }
     topology = builder.createTopology();
 

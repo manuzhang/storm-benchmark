@@ -15,14 +15,14 @@ public class BenchmarkConfig {
   public static final String METRICS_CONSUMER = "metrics.consumer";
   public static final String METRICS_CONSUMER_PARALLELISM = "metrics.consumer.parallelism";
   public static final String MESSAGE_SIZE = "message.size";
-  // enable debug
-  public static final boolean ENABLE_DEBUG = false;
+  // disable debug
+  public static final boolean DISABLE_DEBUG = true;
  // base name of the topology
   public static final String DEFAULT_TOPOLOGY_NAME = "test";
   // number of workers
   public static final int DEFAULT_WORKERS = 4;
   // number of ackers
-  public static final int DEFAULT_EXECUTORS = DEFAULT_WORKERS;
+  public static final int DEFAULT_ACKERS = DEFAULT_WORKERS;
 
   // default size for executer receive buffer
   public static final int DEFAULT_ERBSIZE = 16384;
@@ -47,7 +47,7 @@ public class BenchmarkConfig {
   }
 
   public Config getStormConfig() {
-    return new Config();
+    return config;
   }
 
   public String getTopologyName() {
@@ -59,10 +59,14 @@ public class BenchmarkConfig {
   }
 
   private Map checkAndSetDefault(Map options) {
+    if (null == options) {
+      throw new IllegalArgumentException("no storm config available");
+    }
+
     BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_NAME, DEFAULT_TOPOLOGY_NAME);
-    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_DEBUG, ENABLE_DEBUG);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_DEBUG, DISABLE_DEBUG);
     BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_WORKERS, DEFAULT_WORKERS);
-    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_ACKER_EXECUTORS, DEFAULT_EXECUTORS);
+    BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_ACKER_EXECUTORS, DEFAULT_ACKERS);
     BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, DEFAULT_ERBSIZE);
     BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, DEFAULT_ESBSIZE);
     BenchmarkUtils.putIfAbsent(options, Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, DEFAULT_WRBSIZE);

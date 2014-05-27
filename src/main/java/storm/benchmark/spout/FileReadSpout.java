@@ -6,13 +6,15 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import org.apache.log4j.Logger;
 import storm.benchmark.tools.FileReader;
 
 import java.util.Map;
 
 public class FileReadSpout extends BaseRichSpout {
-
+  private static final Logger LOG = Logger.getLogger(FileReadSpout.class);
   private static final long serialVersionUID = -2582705611472467172L;
+
 	public static final String DEFAULT_FILE = "/resources/A_Tale_of_Two_City.txt";
   public static final boolean DEFAULT_ACK = false;
 

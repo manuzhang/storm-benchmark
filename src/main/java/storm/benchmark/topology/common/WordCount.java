@@ -9,6 +9,7 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import org.apache.log4j.Logger;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.trident.operation.WordSplit;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class WordCount extends StormBenchmark {
+  private static final Logger LOG = Logger.getLogger(WordCount.class);
+
   private static final String SPOUT = "spout";
   private static final String SPLIT = "split";
   private static final String COUNT = "count";
@@ -54,6 +57,10 @@ public abstract class WordCount extends StormBenchmark {
     topology = builder.createTopology();
 
     return this;
+  }
+
+  public IRichSpout getSpout() {
+    return spout;
   }
 
   public static class SplitSentence extends BaseBasicBolt {
@@ -99,4 +106,5 @@ public abstract class WordCount extends StormBenchmark {
       declarer.declare(new Fields("word", "count"));
     }
   }
+
 }

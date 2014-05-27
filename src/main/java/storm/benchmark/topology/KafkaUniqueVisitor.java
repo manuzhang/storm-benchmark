@@ -52,7 +52,7 @@ public class KafkaUniqueVisitor extends StormBenchmark {
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spoutNum);
-    builder.setBolt(VIEW, new PageViewBolt(Item.URL, Item.USER), pvBoltNum).shuffleGrouping(SPOUT);
+    builder.setBolt(VIEW, new PageViewBolt(Item.URL, Item.USER), pvBoltNum).localOrShuffleGrouping(SPOUT);
     builder.setBolt(UNIQUER, new UniqueVisitorBolt(winLen, emitFreq), uvBoltNum).fieldsGrouping(VIEW, new Fields(Item.URL.toString()));
     topology = builder.createTopology();
     return this;

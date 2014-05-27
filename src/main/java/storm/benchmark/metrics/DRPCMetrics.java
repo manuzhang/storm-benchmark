@@ -10,7 +10,9 @@ package storm.benchmark.metrics;
 import backtype.storm.utils.DRPCClient;
 import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
+import storm.benchmark.util.FileUtils;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public class DRPCMetrics extends StormMetrics {
@@ -27,40 +29,45 @@ public class DRPCMetrics extends StormMetrics {
     this.args = args;
     this.server = server;
     this.port = port;
-    writeConf();
   }
 
   @Override
   public StormMetrics start() {
     long now = System.currentTimeMillis();
-    final long endTime = now + total;
+
+    final long endTime = now + totalTime;
     long totalLat = 0L;
     int count = 0;
     try {
+      final String confFile = String.format(METRICS_CONF_FORMAT, path, topoName, now);
+      final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
+      PrintWriter confWriter = FileUtils.createFileWriter(confFile);
+      PrintWriter dataWriter = FileUtils.createFileWriter(dataFile);
+      writeConf(confWriter);
       while (now < endTime) {
-        Thread.sleep(poll);
+        Thread.sleep(pollInterval);
         long lat = execute(nextArg());
-        fileWriter.println(String.format("latency = %d", lat));
-        fileWriter.flush();
+        dataWriter.println(String.format("latency = %d", lat));
+        dataWriter.flush();
         totalLat += lat;
         count++;
         now = System.currentTimeMillis();
       }
       long avgLat = 0 == count ? 0L : totalLat / count;
-      fileWriter.write(String.format("average latency = %d\n", avgLat));
-      fileWriter.close();
+      dataWriter.println(String.format("average latency = %d", avgLat));
+      dataWriter.close();
    } catch (Exception e) {
       LOG.error("fail to execute drpc function", e);
     }
     return this;
   }
 
-  private void writeConf() {
-    confWriter.println(String.format("drpc.function = %s", function));
-    confWriter.println(String.format("drpc.args = {%s}", Utils.join(args, ",")));
-    confWriter.println(String.format("drpc.server = %s", server));
-    confWriter.println(String.format("drpc.port = %s", port));
-    confWriter.close();
+  private void writeConf(PrintWriter writer) {
+    writer.println(String.format("drpc.function = %s", function));
+    writer.println(String.format("drpc.args = {%s}", Utils.join(args, ",")));
+    writer.println(String.format("drpc.server = %s", server));
+    writer.println(String.format("drpc.port = %s", port));
+    writer.close();
   }
 
   private String nextArg() {

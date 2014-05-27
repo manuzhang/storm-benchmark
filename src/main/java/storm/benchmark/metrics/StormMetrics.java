@@ -55,37 +55,34 @@ public class StormMetrics implements IMetrics {
   public static final String SPOUT_AVG_LATENCY_FORMAT = "%.1f";
   public static final String SPOUT_MAX_LATENCY_FORMAT = "%.1f";
 
+  public static final int DEFAULT_POLL_INTERVAL = 30 * 1000; // 30 secs
+  public static final int DEFAULT_TOTAL_TIME =  5 * 60 * 1000; // 5 mins
+  public static final int DEFAULT_MESSAGE_SIZE = 100; // 100 bytes
+  public static final String DEFAULT_PATH = "/root/";
 
   // How often should metrics be collected
-  int poll = 30 * 1000; // 30 secs
+  int pollInterval;
   // How long should the benchmark run for
-  int total = 5 * 60 * 1000; // 5 mins
+  int totalTime;
   // message size
-  int msgSize = 100; // 100 bytes
-  // default path for metrics files
-  String path = "/root/";
+  int msgSize;
+  // metrics file path
+  String path;
 
   Config config;
   StormTopology topology;
   String topoName;
   List<String> header = new LinkedList<String>();
   Map<String, String> metrics = new HashMap<String, String>();
-  PrintWriter confWriter = null;
-  PrintWriter fileWriter = null;
 
   @Override
   public IMetrics setConfig(BenchmarkConfig benchConfig) {
-    this.config = benchConfig.getStormConfig();
-    poll = BenchmarkUtils.getInt(config, METRICS_POLL_FREQ, poll);
-    total = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, total);
-    msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, msgSize);
-    path = (String) Utils.get(config, METRICS_PATH, path);
+    config = benchConfig.getStormConfig();
     topoName = benchConfig.getTopologyName();
-    final long time = System.currentTimeMillis();
-    final String confName = String.format(METRICS_CONF_FORMAT, this.path, topoName, time);
-    final String fileName = String.format(METRICS_FILE_FORMAT, this.path, topoName, time);
-    confWriter = FileUtils.createFileWriter(confName);
-    fileWriter = FileUtils.createFileWriter(fileName);
+    pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_FREQ, DEFAULT_POLL_INTERVAL);
+    totalTime = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, DEFAULT_TOTAL_TIME);
+    msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, DEFAULT_MESSAGE_SIZE);
+    path = (String) Utils.get(config, METRICS_PATH, DEFAULT_PATH);
 
     return this;
   }
@@ -99,11 +96,15 @@ public class StormMetrics implements IMetrics {
   @Override
   public IMetrics start() {
     long now = System.currentTimeMillis();
-    long endTime = now + total;
+    long endTime = now + totalTime;
     MetricsState state = new MetricsState();
     state.startTime = now;
     state.lastTime = now;
 
+    final String confFile = String.format(METRICS_CONF_FORMAT, path, topoName, now);
+    final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
+    PrintWriter confWriter = FileUtils.createFileWriter(confFile);
+    PrintWriter dataWriter = FileUtils.createFileWriter(dataFile);
     writeStormConfig(confWriter);
     addHeaders();
     Nimbus.Client client = getNimbusClient();
@@ -111,14 +112,14 @@ public class StormMetrics implements IMetrics {
     try {
       boolean live = true;
       while (live && now < endTime) {
-        live = pollNimbus(client, now, state);
-        Utils.sleep(poll);
+        live = pollNimbus(client, now, state, dataWriter);
+        Utils.sleep(pollInterval);
         now = System.currentTimeMillis();
       }
     } catch (Exception e) {
       LOG.error("BasicMetrics failed! ", e);
     } finally {
-      fileWriter.close();
+      dataWriter.close();
       confWriter.close();
     }
     return this;
@@ -135,10 +136,11 @@ public class StormMetrics implements IMetrics {
       for (Object key : config.keySet()) {
         writer.println(key + "=" + config.get(key));
       }
+      writer.flush();
     }
   }
 
-  boolean pollNimbus(Nimbus.Client client, long now, MetricsState state)
+  boolean pollNimbus(Nimbus.Client client, long now, MetricsState state, PrintWriter writer)
           throws Exception {
     ClusterSummary cs = client.getClusterInfo();
     if (null == cs) {
@@ -156,10 +158,10 @@ public class StormMetrics implements IMetrics {
     updateExecutorStats(info, state, now, firstTime);
 
     if (firstTime) {
-      writeHeader(fileWriter);
+      writeHeader(writer);
     }
 
-    writeLine(fileWriter);
+    writeLine(writer);
     state.lastTime = now;
 
     return true;

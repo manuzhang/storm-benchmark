@@ -50,7 +50,7 @@ public class DataClean extends StormBenchmark {
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spoutNum);
-    builder.setBolt(VIEW, new PageViewBolt(Item.STATUS, Item.ALL), pvBoltNum).shuffleGrouping(SPOUT);
+    builder.setBolt(VIEW, new PageViewBolt(Item.STATUS, Item.ALL), pvBoltNum).localOrShuffleGrouping(SPOUT);
     builder.setBolt(FILTER, new FilterBolt<Integer>(404), filtBoltNum).fieldsGrouping(VIEW, new Fields(Item.STATUS.toString()));
     topology = builder.createTopology();
     return this;
