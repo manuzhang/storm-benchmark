@@ -21,7 +21,7 @@ public class BenchmarkRunner {
   }
 
   public static void run(IBenchmark benchmark) throws Exception {
-    benchmark.parseOptions(Utils.readStormConfig())
+    benchmark.parseOptions(Utils.readCommandLineOpts())
             .buildTopology()
             .submit()
             .startMetrics();
