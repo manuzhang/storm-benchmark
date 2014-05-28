@@ -29,13 +29,18 @@ public final class FileUtils {
     return lines;
   }
 
-  public static PrintWriter createFileWriter(String name) {
+  public static PrintWriter createFileWriter(String parent, String name) {
     try {
-      final File file = new File(name);
-      file.createNewFile();
-      final PrintWriter writer = new PrintWriter(new OutputStreamWriter(
-      new FileOutputStream(file, true)));
-      return writer;
+      final File dir = new File(parent);
+      if (dir.exists() || dir.mkdirs()) {
+        final File file = new File(name);
+        file.createNewFile();
+        final PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+        new FileOutputStream(file, true)));
+        return writer;
+      } else {
+        throw new RuntimeException("fail to create parent directory " + parent);
+      }
     } catch (IOException e) {
       throw new RuntimeException("No such file or directory " + name, e);
     }

@@ -41,8 +41,8 @@ public class DRPCMetrics extends StormMetrics {
     try {
       final String confFile = String.format(METRICS_CONF_FORMAT, path, topoName, now);
       final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
-      PrintWriter confWriter = FileUtils.createFileWriter(confFile);
-      PrintWriter dataWriter = FileUtils.createFileWriter(dataFile);
+      PrintWriter confWriter = FileUtils.createFileWriter(path, confFile);
+      PrintWriter dataWriter = FileUtils.createFileWriter(path, dataFile);
       writeConf(confWriter);
       while (now < endTime) {
         Thread.sleep(pollInterval);

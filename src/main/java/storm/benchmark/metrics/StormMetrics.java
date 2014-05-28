@@ -16,9 +16,7 @@ import java.util.*;
 public class StormMetrics implements IMetrics {
   private static final Logger LOG = Logger.getLogger(StormMetrics.class);
 
-  public static final String METRICS_POLL_FREQ = "metrics.poll";
-  public static final String METRICS_TOTAL_TIME = "metrics.time";
-  public static final String METRICS_PATH = "metrics.path";
+
 
   /* headers */
   public static final String TIME = "time(s)";
@@ -52,6 +50,10 @@ public class StormMetrics implements IMetrics {
   public static final String SPOUT_AVG_LATENCY_FORMAT = "%.1f";
   public static final String SPOUT_MAX_LATENCY_FORMAT = "%.1f";
 
+  public static final String METRICS_POLL_INTERVAL = "metrics.poll";
+  public static final String METRICS_TOTAL_TIME = "metrics.time";
+  public static final String METRICS_PATH = "metrics.path";
+
   public static final int DEFAULT_POLL_INTERVAL = 30 * 1000; // 30 secs
   public static final int DEFAULT_TOTAL_TIME =  5 * 60 * 1000; // 5 mins
   public static final int DEFAULT_MESSAGE_SIZE = 100; // 100 bytes
@@ -76,7 +78,7 @@ public class StormMetrics implements IMetrics {
   public IMetrics setConfig(BenchmarkConfig benchConfig) {
     config = Utils.readStormConfig();
     topoName = (String) Utils.get(config, Config.TOPOLOGY_NAME, BenchmarkConfig.DEFAULT_TOPOLOGY_NAME);
-    pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_FREQ, DEFAULT_POLL_INTERVAL);
+    pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL);
     totalTime = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, DEFAULT_TOTAL_TIME);
     msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, DEFAULT_MESSAGE_SIZE);
     path = (String) Utils.get(config, METRICS_PATH, DEFAULT_PATH);
@@ -100,8 +102,8 @@ public class StormMetrics implements IMetrics {
 
     final String confFile = String.format(METRICS_CONF_FORMAT, path, topoName, now);
     final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
-    PrintWriter confWriter = FileUtils.createFileWriter(confFile);
-    PrintWriter dataWriter = FileUtils.createFileWriter(dataFile);
+    PrintWriter confWriter = FileUtils.createFileWriter(path, confFile);
+    PrintWriter dataWriter = FileUtils.createFileWriter(path, dataFile);
     writeStormConfig(confWriter);
     addHeaders();
     Nimbus.Client client = getNimbusClient();
@@ -302,13 +304,13 @@ public class StormMetrics implements IMetrics {
   }
 
   void writeHeader(PrintWriter writer) {
-    LOG.info("writing out headers into .csv file");
+    LOG.info("writing out metrics headers into .csv file");
     writer.println(Utils.join(header, ","));
     writer.flush();
   }
 
   void writeLine(PrintWriter writer) {
-    LOG.info("writing out one line data into .csv file");
+    LOG.info("writing out metrics results into .csv file");
     List<String> line = new LinkedList<String>();
     for (String h : header) {
       line.add(metrics.get(h));
