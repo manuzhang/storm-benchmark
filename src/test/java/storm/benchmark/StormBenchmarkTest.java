@@ -1,17 +1,43 @@
 package storm.benchmark;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import storm.benchmark.metrics.IMetrics;
+import storm.benchmark.metrics.StormMetrics;
+import storm.benchmark.topology.FileReadWordCount;
+import storm.benchmark.topology.RollingSort;
+import storm.benchmark.topology.SOL;
+import storm.benchmark.topology.TridentWordCount;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class StormBenchmarkTest {
-  @Test
-  public void parseOptionsShouldCreateConfigAndMetrics() {
-/*    StormBenchmark benchmark = mock(StormBenchmark.class);
-    benchmark.parseOptions(anyMap());
+
+  private static final Map ANY_MAP = new HashMap();
+
+  @Test(dataProvider = "getBenchmarks")
+  public void parseOptionsShouldCreateConfigAndMetrics(StormBenchmark benchmark, Class<IMetrics> metricsClass) {
+    benchmark.parseOptions(ANY_MAP);
     assertThat(benchmark.getConfig())
-            .isNotNull().isInstanceOf(BenchmarkConfig.class);
+            .isNotNull();
     assertThat(benchmark.getMetrics())
-            .isNotNull().isInstanceOf(IMetrics.class);
-    assertThat(benchmark.getTopology()).isNull();*/
+            .isNotNull()
+            .isInstanceOf(metricsClass);
+
+  }
+
+
+  @DataProvider
+  private Object[][] getBenchmarks() {
+    return new Object[][] {
+            { new FileReadWordCount(), StormMetrics.class },
+            { new SOL(), StormMetrics.class },
+            { new RollingSort(), StormMetrics.class },
+            { new TridentWordCount(), StormMetrics.class }
+    };
   }
 
 }

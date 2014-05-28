@@ -46,7 +46,7 @@ public class StormMetrics implements IMetrics {
   public static final String LAST_THREE_HOURS = "10800";
   public static final String LAST_DAY = "86400";
 
-  public static final String METRICS_CONF_FORMAT = "%s/%s_metrics_%d.conf";
+  public static final String METRICS_CONF_FORMAT = "%s/%s_metrics_%d.yaml";
   public static final String METRICS_FILE_FORMAT = "%s/%s_metrics_%d.csv";
 
   public static final String SPOUT_AVG_LATENCY_FORMAT = "%.1f";
@@ -127,12 +127,12 @@ public class StormMetrics implements IMetrics {
   }
 
   public void writeStormConfig(PrintWriter writer) {
-    LOG.info("writing out storm config into .conf file");
+    LOG.info("writing out storm config into .yaml file");
     if (writer != null) {
       Map sorted = new TreeMap();
       sorted.putAll(config);
       for (Object key : sorted.keySet()) {
-        writer.println(key + "=" + config.get(key));
+        writer.println(key + ": " + config.get(key));
       }
       writer.flush();
     }

@@ -61,5 +61,4 @@ public abstract class StormBenchmark implements IBenchmark {
   public IMetrics getMetrics() {
     return metrics;
   }
-
 }
