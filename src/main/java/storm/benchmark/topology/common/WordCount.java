@@ -21,9 +21,9 @@ import java.util.Map;
 public abstract class WordCount extends StormBenchmark {
   private static final Logger LOG = Logger.getLogger(WordCount.class);
 
-  private static final String SPOUT = "spout";
-  private static final String SPLIT = "split";
-  private static final String COUNT = "count";
+  public static final String SPOUT = "topology.component.spout_num";
+  public static final String SPLIT = "topology.component.split_bolt_num";
+  public static final String COUNT = "topology.component.count_bolt_num";
 
   // number of spoutNum to run in parallel
   protected int spoutNum = 8;

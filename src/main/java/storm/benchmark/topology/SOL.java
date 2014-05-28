@@ -16,14 +16,13 @@ import java.util.Map;
 
 public class SOL extends StormBenchmark {
 
+  public static final String TOPOLOGY_LEVEL = "topology.level";
+  public static final String SPOUT = "topology.component.spout_num";
+  public static final String BOLT = "topology.component.bolt_num";
   private int msgSize = 100;
   private int numLevels = 2;
   private int spoutNum = 4;
   private int boltNum = 4;
-  private static final String TOPOLOGY_LEVEL = "topology.level";
-
-  private static final String SPOUT = "spout";
-  private static final String BOLT = "bolt";
 
   @Override
   public IBenchmark parseOptions(Map options) {
