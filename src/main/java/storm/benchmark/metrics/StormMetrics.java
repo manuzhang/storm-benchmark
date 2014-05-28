@@ -37,7 +37,8 @@ public class StormMetrics implements IMetrics {
   public static final String SPOUT_THROUGHPUT = "spout_throughput (messages/s)";
   public static final String SPOUT_THROUGHPUT_MB = "spout_throughput (MB/s)";
   public static final String SPOUT_THROUGHPUT_MB_FORMAT = "%.3f";
-
+  public static final String SPOUT_AVG_COMPLETE_LATENCY = "%s_avg_complete_latency(ms)";
+  public static final String SPOUT_MAX_COMPLETE_LATENCY = "%s_max_complete_latency(ms)";
 
   public static final String ALL_TIME = ":all-time";
   public static final String LAST_TEN_MINS = "600";
@@ -105,13 +106,12 @@ public class StormMetrics implements IMetrics {
     PrintWriter confWriter = FileUtils.createFileWriter(path, confFile);
     PrintWriter dataWriter = FileUtils.createFileWriter(path, dataFile);
     writeStormConfig(confWriter);
-    addHeaders();
-    Nimbus.Client client = getNimbusClient();
+    writeHeader(dataWriter);
 
     try {
       boolean live = true;
       while (live && now < endTime) {
-        live = pollNimbus(client, now, state, dataWriter);
+        live = pollNimbus(getNimbusClient(), now, state, dataWriter);
         Utils.sleep(pollInterval);
         now = System.currentTimeMillis();
       }
@@ -158,12 +158,7 @@ public class StormMetrics implements IMetrics {
 
     updateTopologyStats(ts, state, now);
     TopologyInfo info = client.getTopologyInfo(ts.get_id());
-    boolean firstTime = (now == state.startTime);
-    updateExecutorStats(info, state, now, firstTime);
-
-    if (firstTime) {
-      writeHeader(writer);
-    }
+    updateExecutorStats(info, state, now);
 
     writeLine(writer);
     state.lastTime = now;
@@ -193,7 +188,7 @@ public class StormMetrics implements IMetrics {
     metrics.put(USED_SLOTS, Integer.toString(usedSlots));
   }
 
-  void updateExecutorStats(TopologyInfo info, MetricsState state, long now, boolean firstTime) {
+  void updateExecutorStats(TopologyInfo info, MetricsState state, long now) {
     long overallTransferred = 0;
     long spoutTransferred = 0;
     long spoutAcked = 0;
@@ -203,38 +198,40 @@ public class StormMetrics implements IMetrics {
     Map<String, List<Double>> comLat = new HashMap<String, List<Double>>();
     for (ExecutorSummary es : info.get_executors()) {
       String id = es.get_component_id();
-      LOG.debug("get stats for component: " + id);
+      LOG.debug("get ExecutorSummary of component: " + id);
       if (Utils.isSystemId(id)) {
         LOG.debug("skip system component: " + id);
         continue;
       }
       ExecutorStats exeStats = es.get_stats();
       if (exeStats != null) {
+        executorsWithMetircs++;
         ExecutorSpecificStats specs = exeStats.get_specific();
         ComponentCommon common = Utils.getComponentCommon(topology, id);
+        boolean isSpout = isSpout(specs);
+        if (isSpout) {
+          spoutExecutors++;
+        }
         for (String stream : common.get_streams().keySet()) {
-          LOG.debug("get stream " + stream + " for component " + id);
-          executorsWithMetircs++;
+          LOG.debug("get stream " + stream + " of component: " + id);
           long transferred = MetricsUtils.getTransferred(exeStats, ALL_TIME, stream);
           overallTransferred += transferred;
-          if (isSpout(specs)) {
+          if (isSpout) {
             if (isDefaultStream(stream) || isBatchStream(stream)) {
-              spoutExecutors++;
               spoutTransferred += transferred;
               SpoutStats spStats = specs.get_spout();
               spoutAcked += MetricsUtils.getSpoutAcked(spStats, ALL_TIME, stream);
-              // first time
-              if (firstTime) {
-                header.add(MetricsUtils.getSpoutAvgCompleteLatencyTitle(id));
-              }
+
               double lat = MetricsUtils.getSpoutCompleteLatency(spStats, ALL_TIME, stream);
               MetricsUtils.addLatency(comLat, id, lat);
-
+            } else {
+              LOG.debug("skip non-default and non-batch stream: " + stream
+                      + " of spout: " + id);
             }
           }
         }
       } else {
-        LOG.error("executor stats not found for component id: " + id );
+        LOG.warn("executor stats not found for component: " + id);
       }
     }
     for (String id : comLat.keySet()) {
@@ -273,6 +270,7 @@ public class StormMetrics implements IMetrics {
   }
 
 
+
   boolean isSpout(ExecutorSpecificStats specs) {
     return specs != null && specs.is_set_spout();
   }
@@ -282,10 +280,11 @@ public class StormMetrics implements IMetrics {
   }
 
   boolean isBatchStream(String stream) {
-    return stream.equals("batch");
+    return stream.equals("$batch");
   }
 
-  void addHeaders() {
+
+  void writeHeader(PrintWriter writer) {
     header.add(TIME);
     header.add(TOTAl_SLOTS);
     header.add(USED_SLOTS);
@@ -301,9 +300,8 @@ public class StormMetrics implements IMetrics {
     header.add(SPOUT_ACKED);
     header.add(SPOUT_THROUGHPUT);
     header.add(SPOUT_THROUGHPUT_MB);
-  }
-
-  void writeHeader(PrintWriter writer) {
+    header.add(String.format(SPOUT_AVG_LATENCY_FORMAT, "spout"));
+    header.add(String.format(SPOUT_MAX_LATENCY_FORMAT, "spout"));
     LOG.info("writing out metrics headers into .csv file");
     writer.println(Utils.join(header, ","));
     writer.flush();
