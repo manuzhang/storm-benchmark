@@ -15,7 +15,7 @@ public final class KafkaUtils {
   public static final String ZOOKEEPER_SERVERS = "zookeeper.servers";
   public static final String KAFKA_ROOT_PATH = "kafka.root.path";
   public static final String TOPIC = "topic";
-  public static final String APP_ID = "id";
+  public static final String CLIENT_ID = "client_id";
 
   public static final String DEFAULT_TOPIC = "storm";
 
@@ -30,7 +30,7 @@ public final class KafkaUtils {
     BrokerHosts hosts = new ZkHosts(connectString);
     String topic = (String) Utils.get(options, TOPIC, DEFAULT_TOPIC);
     String zkRoot = kafkaRoot + "/" + "storm-consumer-states";
-    String appId = (String) Utils.get(options, APP_ID, "storm-app");
+    String appId = (String) Utils.get(options, CLIENT_ID, "storm-app");
 
     SpoutConfig config = new SpoutConfig(hosts, topic, zkRoot, appId);
     config.zkServers = new ArrayList<String>();
@@ -60,7 +60,7 @@ public final class KafkaUtils {
 
     BrokerHosts hosts = new ZkHosts(connectString);
     String topic = (String) Utils.get(options, TOPIC, DEFAULT_TOPIC);
-    String appId = (String) Utils.get(options, APP_ID, "storm-app");
+    String appId = (String) Utils.get(options, CLIENT_ID, "storm-app");
 
     TridentKafkaConfig config = new TridentKafkaConfig(hosts, topic, appId);
     config.scheme = scheme;
