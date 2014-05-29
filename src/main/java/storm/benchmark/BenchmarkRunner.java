@@ -34,11 +34,14 @@ public class BenchmarkRunner {
 
   public static IBenchmark getBenchmarkFrom(String name)
           throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-    String packName = "storm.benchmark.topology";
-    if (name.startsWith(packName) || name.contains(".")) {
+    String topologyPkg = "storm.benchmark.topology";
+    String kafkaPkg = "storm.benchmark.kafka";
+    if (name.startsWith(topologyPkg) || name.startsWith(kafkaPkg)) {
       return getBenchmarkFrom(Class.forName(name));
+    } else if (name.endsWith("Producer")) {
+      return getBenchmarkFrom(Class.forName(kafkaPkg + "." + name));
     } else {
-      return getBenchmarkFrom(Class.forName(packName + "." + name));
+      return getBenchmarkFrom(Class.forName(topologyPkg + "." + name));
     }
   }
 }

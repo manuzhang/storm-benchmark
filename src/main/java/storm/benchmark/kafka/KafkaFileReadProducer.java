@@ -5,7 +5,7 @@ import storm.benchmark.kafka.common.KafkaProducer;
 
 import java.util.Map;
 
-public class KafkaFileProducer extends KafkaProducer {
+public class KafkaFileReadProducer extends KafkaProducer {
 
   public static final String FILE = "/resources/A_Tale_of_Two_City.txt";
 

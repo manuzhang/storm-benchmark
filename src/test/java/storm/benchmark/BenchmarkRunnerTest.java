@@ -57,8 +57,8 @@ public class BenchmarkRunnerTest {
             {"RollingSort"}, {"storm.benchmark.topology.RollingSort"},
             {"SOL"}, {"storm.benchmark.topology.SOL"},
             {"TridentWordCount"}, {"storm.benchmark.topology.TridentWordCount"},
-            {"storm.benchmark.kafka.KafkaFileProducer"},
-            {"storm.benchmark.kafka.KafkaPageViewProducer"}
+            {"KafkaFileReadProducer"}, {"storm.benchmark.kafka.KafkaFileReadProducer"},
+            {"KafkaPageViewProducer"}, {"storm.benchmark.kafka.KafkaPageViewProducer"}
     };
   }
 
