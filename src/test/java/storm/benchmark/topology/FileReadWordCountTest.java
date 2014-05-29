@@ -14,8 +14,6 @@ import java.util.Map;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class FileReadWordCountTest {
-
-  private final Map ANY_MAP = new HashMap();
   private final Map options = new HashMap();
   private StormBenchmark benchmark;
 

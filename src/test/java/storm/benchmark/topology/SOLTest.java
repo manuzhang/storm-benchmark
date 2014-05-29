@@ -13,7 +13,6 @@ import java.util.Map;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class SOLTest {
-  private final Map ANY_MAP = new HashMap();
   private final Map options = new HashMap();
   private StormBenchmark benchmark;
 
@@ -33,6 +32,5 @@ public class SOLTest {
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, SOL.SPOUT_ID), 4);
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, SOL.BOLT_ID + "1"), 3);
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, SOL.BOLT_ID + "2"), 3);
-
   }
 }
