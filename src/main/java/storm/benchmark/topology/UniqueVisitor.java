@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static storm.benchmark.tools.PageView.Item;
 
-public class KafkaUniqueVisitor extends StormBenchmark {
+public class UniqueVisitor extends StormBenchmark {
   private final static String SPOUT = "spout";
   private final static String VIEW = "view";
   private final static String UNIQUER = "uniquer";

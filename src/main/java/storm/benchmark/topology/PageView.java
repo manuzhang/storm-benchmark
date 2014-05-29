@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static storm.benchmark.tools.PageView.Item;
 
-public class KafkaPageView  extends StormBenchmark {
+public class PageView extends StormBenchmark {
   private static final String SPOUT = "spout";
   private static final String VIEW = "view";
   private static final String COUNT = "count";
