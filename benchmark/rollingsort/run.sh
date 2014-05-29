@@ -1,10 +1,9 @@
 #!/bin/bash
 
-echo "========== running RollingSort topology =========="
-# configure
+echo "========== running RollingSort =========="
+# load functions
 DIR=`dirname "$0"`
-. "${DIR}/../conf/config.sh"
-. "${DIR}/config.sh"
+. $DIR/../bin/functions.sh
 
 run_benchmark
 

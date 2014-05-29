@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "========== running WordCount =========="
+echo "========== running TridentWordCount =========="
 # load functions
 DIR=`dirname "$0"`
 . $DIR/../bin/functions.sh

@@ -20,17 +20,11 @@ public class MetricsUtils {
     List<Double> latList = stats.get(id);
     if (null == latList) {
       latList = new LinkedList<Double>();
+      stats.put(id, latList);
     }
     latList.add(lat);
   }
 
-  public static String getSpoutAvgCompleteLatencyTitle(String id) {
-    return id + "_avg_complete_latency(ms)";
-  }
-
-  public static String getSpoutMaxCompleteLatencyTitle(String id) {
-    return id + "_max_complete_lantency(ms)";
-  }
 
   public static TopologySummary getTopologySummary(ClusterSummary cs, String name) {
     for (TopologySummary ts : cs.get_topologies()) {

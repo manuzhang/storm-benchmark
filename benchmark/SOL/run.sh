@@ -1,13 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "========== running SOL topology =========="
-# configure
+echo "========== running SOL =========="
+# load functions
 DIR=`dirname "$0"`
-. "${DIR}/../conf/config.sh"
-. "${DIR}/config.sh"
-
+. $DIR/../bin/functions.sh
 
 run_benchmark
-
-
 

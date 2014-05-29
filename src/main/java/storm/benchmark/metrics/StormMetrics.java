@@ -37,8 +37,8 @@ public class StormMetrics implements IMetrics {
   public static final String SPOUT_THROUGHPUT = "spout_throughput (messages/s)";
   public static final String SPOUT_THROUGHPUT_MB = "spout_throughput (MB/s)";
   public static final String SPOUT_THROUGHPUT_MB_FORMAT = "%.3f";
-  public static final String SPOUT_AVG_COMPLETE_LATENCY = "%s_avg_complete_latency(ms)";
-  public static final String SPOUT_MAX_COMPLETE_LATENCY = "%s_max_complete_latency(ms)";
+  public static final String SPOUT_AVG_COMPLETE_LATENCY = "spout_avg_complete_latency(ms)";
+  public static final String SPOUT_MAX_COMPLETE_LATENCY = "spout_max_complete_latency(ms)";
 
   public static final String ALL_TIME = ":all-time";
   public static final String LAST_TEN_MINS = "600";
@@ -215,6 +215,8 @@ public class StormMetrics implements IMetrics {
         for (String stream : common.get_streams().keySet()) {
           LOG.debug("get stream " + stream + " of component: " + id);
           long transferred = MetricsUtils.getTransferred(exeStats, ALL_TIME, stream);
+          LOG.debug(String.format("%s transferred %d messages in stream %s during window %s",
+                  id, transferred, stream, ALL_TIME));
           overallTransferred += transferred;
           if (isSpout) {
             if (isDefaultStream(stream) || isBatchStream(stream)) {
@@ -223,6 +225,7 @@ public class StormMetrics implements IMetrics {
               spoutAcked += MetricsUtils.getSpoutAcked(spStats, ALL_TIME, stream);
 
               double lat = MetricsUtils.getSpoutCompleteLatency(spStats, ALL_TIME, stream);
+              LOG.debug(String.format("spout %s complete latency in stream %s during window %s", id, stream, ALL_TIME));
               MetricsUtils.addLatency(comLat, id, lat);
             } else {
               LOG.debug("skip non-default and non-batch stream: " + stream
@@ -234,13 +237,17 @@ public class StormMetrics implements IMetrics {
         LOG.warn("executor stats not found for component: " + id);
       }
     }
+    if (comLat.isEmpty()) {
+      metrics.put(SPOUT_AVG_COMPLETE_LATENCY, "0.0");
+      metrics.put(SPOUT_MAX_COMPLETE_LATENCY, "0.0");
+    }
     for (String id : comLat.keySet()) {
       List<Double> latList = comLat.get(id);
       double avg = null == latList ? 0.0 : BenchmarkUtils.avg(latList);
       double max = null == latList ? 0.0 : BenchmarkUtils.max(latList);
-      metrics.put(MetricsUtils.getSpoutAvgCompleteLatencyTitle(id),
+      metrics.put(SPOUT_AVG_COMPLETE_LATENCY,
               String.format(SPOUT_AVG_LATENCY_FORMAT, avg));
-      metrics.put(MetricsUtils.getSpoutMaxCompleteLatencyTitle(id),
+      metrics.put(SPOUT_MAX_COMPLETE_LATENCY,
               String.format(SPOUT_MAX_LATENCY_FORMAT, max));
 
     }
@@ -266,7 +273,6 @@ public class StormMetrics implements IMetrics {
 
     state.overallTransferred = overallTransferred;
     state.spoutTransferred = spoutTransferred;
-
   }
 
 
@@ -300,8 +306,8 @@ public class StormMetrics implements IMetrics {
     header.add(SPOUT_ACKED);
     header.add(SPOUT_THROUGHPUT);
     header.add(SPOUT_THROUGHPUT_MB);
-    header.add(String.format(SPOUT_AVG_LATENCY_FORMAT, "spout"));
-    header.add(String.format(SPOUT_MAX_LATENCY_FORMAT, "spout"));
+    header.add(SPOUT_AVG_COMPLETE_LATENCY);
+    header.add(SPOUT_MAX_COMPLETE_LATENCY);
     LOG.info("writing out metrics headers into .csv file");
     writer.println(Utils.join(header, ","));
     writer.flush();
