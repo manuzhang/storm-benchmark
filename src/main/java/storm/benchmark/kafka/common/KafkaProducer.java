@@ -19,8 +19,10 @@ import java.util.Map;
  */
 public abstract class KafkaProducer extends StormBenchmark {
 
-  public static final String SPOUT = "spout";
-  public static final String BOLT = "bolt";
+  public static final String SPOUT_ID = "spout";
+  public static final String SPOUT_NUM = "producer.spout_num";
+  public static final String BOLT_ID = "bolt";
+  public static final String BOLT_NUM = "producer.bolt_num";
   public static final String BROKER_LIST = "broker.list";
   public static final String TOPIC = "topic";
 
@@ -39,8 +41,8 @@ public abstract class KafkaProducer extends StormBenchmark {
     Map stormConfig = config.getStormConfig();
     stormConfig.putAll(getKafkaConfig(options));
 
-    spoutNum = BenchmarkUtils.getInt(options, SPOUT, spoutNum);
-    boltNum = BenchmarkUtils.getInt(options, BOLT, boltNum);
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
+    boltNum = BenchmarkUtils.getInt(options, BOLT_NUM, boltNum);
 
     return this;
   }
@@ -48,9 +50,15 @@ public abstract class KafkaProducer extends StormBenchmark {
   @Override
   public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
-    builder.setSpout(SPOUT, spout, spoutNum);
-    builder.setBolt(BOLT, bolt, boltNum).localOrShuffleGrouping(SPOUT);
+    builder.setSpout(SPOUT_ID, spout, spoutNum);
+    builder.setBolt(BOLT_ID, bolt, boltNum).localOrShuffleGrouping(SPOUT_ID);
     topology = builder.createTopology();
+    return this;
+  }
+
+  @Override
+  public IBenchmark startMetrics() {
+    // don't run metrics for producers
     return this;
   }
 

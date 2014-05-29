@@ -19,7 +19,6 @@ import java.util.Map;
 
 public class TridentWordCount extends StormBenchmark {
 
-  public static final String MAX_BATCH_SIZE = "trident.max.batch.size";
   public static final String SPOUT_ID = "spout";
   public static final String SPOUT_NUM = "topology.component.spout_num";
   public static final String SPLIT_ID = "split";
@@ -27,7 +26,6 @@ public class TridentWordCount extends StormBenchmark {
   public static final String COUNT_ID = "count";
   public static final String COUNT_NUM = "topology.component.count_bolt_num";
 
-  private int maxBatchSize = 3;
   // number of spoutNum to run in parallel
   private int spoutNum = 8;
   // number of splitNum to run in parallel
@@ -40,7 +38,6 @@ public class TridentWordCount extends StormBenchmark {
   @Override
   public IBenchmark parseOptions(Map options) {
     super.parseOptions(options);
-    maxBatchSize = BenchmarkUtils.getInt(options, MAX_BATCH_SIZE, maxBatchSize);
     spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
     splitNum = BenchmarkUtils.getInt(options, SPLIT_NUM, splitNum);
     countNum = BenchmarkUtils.getInt(options, COUNT_NUM, countNum);
