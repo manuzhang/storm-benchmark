@@ -34,18 +34,17 @@ public class TridentFileReadSpout implements IBatchSpout {
 
   private static final long serialVersionUID = -3538746749629409899L;
   private static final String DEFAULT_FILE = "/resources/A_Tale_of_Two_City.txt";
+  public static final String FIELDS = "sentence";
 
-  private Fields fields;
   private int maxBatchSize;
   private FileReader reader;
   private HashMap<Long, List<String>> batches = new HashMap<Long, List<String>>();
 
-  public TridentFileReadSpout(Fields fields, int maxBatchSize) {
-    this(fields, maxBatchSize, DEFAULT_FILE);
+  public TridentFileReadSpout(int maxBatchSize) {
+    this(maxBatchSize, DEFAULT_FILE);
   }
 
-  public TridentFileReadSpout(Fields fields, int maxBatchSize, String file) {
-    this.fields = fields;
+  public TridentFileReadSpout(int maxBatchSize, String file) {
     this.maxBatchSize = maxBatchSize;
     this.reader = new FileReader(file);
   }
@@ -85,7 +84,7 @@ public class TridentFileReadSpout implements IBatchSpout {
 
   @Override
   public Fields getOutputFields() {
-    return fields;
+    return new Fields(FIELDS);
   }
     
 }
