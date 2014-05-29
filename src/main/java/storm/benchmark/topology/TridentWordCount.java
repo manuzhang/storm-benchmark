@@ -46,8 +46,8 @@ public class TridentWordCount extends StormBenchmark {
     TridentFileReadSpout spout = new TridentFileReadSpout(new Fields("sentence"), maxBatchSize);
 
     TridentTopology trident = new TridentTopology();
-    trident.newStream(SPOUT_ID, spout)
-      .each(new Fields("sentence"), new WordSplit(), new Fields("word"))
+    trident.newStream(SPOUT_ID, spout).parallelismHint(spoutNum)
+      .each(new Fields("sentence"), new WordSplit(), new Fields("word")).parallelismHint(splitNum)
       .groupBy(new Fields("word"))
       .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("count")).parallelismHint(countNum);
 
