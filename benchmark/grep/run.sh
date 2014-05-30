@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "========== running TridentWordCount =========="
+echo "========== running Grep =========="
 CUR_DIR=`dirname "$0"`
 BIN_DIR=$CUR_DIR/../bin
 CONF_DIR=$CUR_DIR/../conf
