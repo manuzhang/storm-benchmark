@@ -1,5 +1,6 @@
 package storm.benchmark.tools;
 
+import org.apache.log4j.Logger;
 import storm.trident.operation.BaseFunction;
 import storm.trident.operation.TridentCollector;
 import storm.trident.tuple.TridentTuple;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PageView {
+  private static Logger LOG = Logger.getLogger(PageView.class);
   public final String url;
   public final int status;
   public final int zipCode;
@@ -26,11 +28,15 @@ public class PageView {
   }
 
   public static PageView fromString(String s) {
+    LOG.debug("get string '" + s + "'");
     String[] parts = s.split("\t");
     if (parts.length < 4) {
       return null;
     }
-    return new PageView(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+    return new PageView(parts[0],
+            Integer.parseInt(parts[1]),
+            Integer.parseInt(parts[2]),
+            Integer.parseInt(parts[3]));
   }
 
   public Object getValue(Item field) {
@@ -80,7 +86,12 @@ public class PageView {
 
     @Override
     public void execute(TridentTuple tuple, TridentCollector collector) {
-      PageView pageView = PageView.fromString(tuple.getString(0));
+      String pvString = tuple.getString(0);
+      PageView pageView = PageView.fromString(pvString);
+      if (null == pageView) {
+        LOG.error("invalid pageview string '" + pvString + "'");
+        return;
+      }
       List<Object> values = new ArrayList<Object>();
       for (Item field : fields) {
         values.add(pageView.getValue(field));
