@@ -14,5 +14,6 @@ public class PageViewTest {
     assertThat(pageView.status).isEqualTo(200);
     assertThat(pageView.zipCode).isEqualTo(100000);
     assertThat(pageView.userID).isEqualTo(1);
+    assertThat(pageView.toString()).isEqualTo(pvString);
   }
 }

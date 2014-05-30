@@ -5,6 +5,7 @@ import backtype.storm.tuple.Fields;
 import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.DRPCMetrics;
+import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.StringScheme;
 import storm.kafka.trident.TransactionalTridentKafkaSpout;
@@ -30,7 +31,16 @@ public class DRPC extends StormBenchmark {
           Arrays.asList("http://foo.com/", "http://foo.com/news", "http://foo.com/contact");
   public static final String SERVER = "drpc.server";
   public static final String PORT = "drpc.port";
+  public static final String SPOUT_ID = "spout";
+  public static final String SPOUT_NUM = "topology.component.spout_num";
+  public static final String PAGE_ID = "page";
+  public static final String PAGE_NUM = "topology.component.page_bolt_num";
+  public static final String VIEW_ID = "view";
+  public static final String VIEW_NUM = "topology.component.view_bolt_num";
 
+  private int spoutNum = 4;
+  private int pageNum = 8;
+  private int viewNum = 8;
   private IPartitionedTridentSpout spout;
 
 
@@ -48,6 +58,10 @@ public class DRPC extends StormBenchmark {
       throw new IllegalArgumentException("must set a drpc port");
     }
 
+    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
+    pageNum = BenchmarkUtils.getInt(options, PAGE_NUM, pageNum);
+    viewNum = BenchmarkUtils.getInt(options, VIEW_NUM, viewNum);
+
     spout = new TransactionalTridentKafkaSpout(
             KafkaUtils.getTridentKafkaConfig(options, new SchemeAsMultiScheme(new StringScheme())));
     metrics = new DRPCMetrics(FUNCTION, ARGS, server, port);
@@ -58,10 +72,12 @@ public class DRPC extends StormBenchmark {
   @Override
   public IBenchmark buildTopology() {
     TridentTopology trident = new TridentTopology();
-    TridentState state = trident.newStream("drpc", spout).shuffle()
-            .each(new Fields(StringScheme.STRING_SCHEME_KEY), new Extract(Arrays.asList(Item.URL)), new Fields("urls"))
-            .groupBy(new Fields("urls"))
-            .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("url_counts"));
+    TridentState state = trident.newStream("drpc", spout).parallelismHint(spoutNum).shuffle()
+            .each(new Fields(StringScheme.STRING_SCHEME_KEY), new Extract(Arrays.asList(Item.URL)), new Fields("pages"))
+            .parallelismHint(pageNum)
+            .groupBy(new Fields("pages"))
+            .persistentAggregate(new MemoryMapState.Factory(), new Count(), new Fields("views"))
+            .parallelismHint(viewNum);
 
     trident.newDRPCStream(FUNCTION, null).stateQuery(state, new Fields("args"),  new MapGet(), new Fields("page_views"));
     topology = trident.build();

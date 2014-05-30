@@ -24,14 +24,17 @@ public class PageView {
 
   @Override
   public String toString() {
-    return String.format("%s\t%d\t%d\t%d\n", url, status, zipCode, userID);
+    return String.format("%s\t%d\t%d\t%d", url, status, zipCode, userID);
   }
 
-  public static PageView fromString(String s) {
-    LOG.debug("get string '" + s + "'");
-    String[] parts = s.split("\t");
+  public static PageView fromString(String pv) {
+    LOG.debug("get string '" + pv + "'");
+    String[] parts = pv.split("\t");
     if (parts.length < 4) {
       return null;
+    }
+    for (int i = 0; i < parts.length; i++) {
+      parts[i] = parts[i].trim();
     }
     return new PageView(parts[0],
             Integer.parseInt(parts[1]),

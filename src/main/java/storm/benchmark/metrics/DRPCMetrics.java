@@ -7,9 +7,10 @@ package storm.benchmark.metrics;
  * receiving the result
  */
 
+import backtype.storm.generated.DRPCExecutionException;
 import backtype.storm.utils.DRPCClient;
-import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
+import org.apache.thrift7.TException;
 import storm.benchmark.util.FileUtils;
 
 import java.io.PrintWriter;
@@ -43,31 +44,25 @@ public class DRPCMetrics extends StormMetrics {
       final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
       PrintWriter confWriter = FileUtils.createFileWriter(path, confFile);
       PrintWriter dataWriter = FileUtils.createFileWriter(path, dataFile);
-      writeConf(confWriter);
+      writeStormConfig(confWriter);
       while (now < endTime) {
         Thread.sleep(pollInterval);
-        long lat = execute(nextArg());
-        dataWriter.println(String.format("latency = %d", lat));
-        dataWriter.flush();
+        long lat = execute(nextArg(), dataWriter);
         totalLat += lat;
         count++;
         now = System.currentTimeMillis();
       }
-      long avgLat = 0 == count ? 0L : totalLat / count;
-      dataWriter.println(String.format("average latency = %d", avgLat));
+      double avgLat = 0 == count ? 0.0 : (double) totalLat / count;
+      dataWriter.println(String.format("average latency = %f ms", avgLat));
       dataWriter.close();
-   } catch (Exception e) {
+    } catch (DRPCExecutionException e) {
       LOG.error("fail to execute drpc function", e);
+    } catch (TException e) {
+      LOG.error("thrift error", e);
+    } catch (InterruptedException e) {
+      LOG.error("interrupted", e);
     }
     return this;
-  }
-
-  private void writeConf(PrintWriter writer) {
-    writer.println(String.format("drpc.function = %s", function));
-    writer.println(String.format("drpc.args = {%s}", Utils.join(args, ",")));
-    writer.println(String.format("drpc.server = %s", server));
-    writer.println(String.format("drpc.port = %s", port));
-    writer.close();
   }
 
   private String nextArg() {
@@ -79,12 +74,15 @@ public class DRPCMetrics extends StormMetrics {
     return ret;
   }
 
-  private long execute(String arg) throws Exception {
+  private long execute(String arg, PrintWriter writer) throws TException, DRPCExecutionException {
+    LOG.debug(String.format("executing %s('%s')", function, arg));
     DRPCClient client = new DRPCClient(server, port);
     long start = System.currentTimeMillis();
     String result = client.execute(function, arg);
     long end = System.currentTimeMillis();
-    LOG.info(String.format("%s(\"%s\") = %s", function, arg, result));
-    return end - start;
+    long latency = end - start;
+    writer.println(String.format("%s('%s') = %s, latency = %d ms", function, arg, result, latency));
+    writer.flush();
+    return latency;
   }
 }
