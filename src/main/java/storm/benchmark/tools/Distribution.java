@@ -22,13 +22,11 @@ public class Distribution<T> implements Serializable {
 
   public static Distribution intEvenDistribution(int start, int end) {
     if (start >= end) {
-      return null;
+      throw new IllegalArgumentException(String.format("invalid arguments [%d, %d) to generate even distribution", start, end));
     }
-    int range = end - start;
     List<Pair<Integer, Double>> pairs = new ArrayList<Pair<Integer, Double>>();
     for (int i = start; i < end; i++) {
-      double p = i / (double) range;
-      pairs.add(new Pair(i, p));
+      pairs.add(new Pair(i, 1.0 / (end - start)));
     }
     return new Distribution(pairs);
   }

@@ -4,7 +4,7 @@ TOPOLOGY_CLASS=DRPC
 TOPOLOGY_NAME=DRPC
 
 PRODUCER_NAME=KafkaPageViewProducer
-TOPIC="pageview"
+TOPIC="reach"
 CLIENT_ID="drpc"
 
 WORKERS=4

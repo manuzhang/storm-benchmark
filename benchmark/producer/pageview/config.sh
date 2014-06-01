@@ -3,7 +3,7 @@
 TOPOLOGY_CLASS=KafkaPageViewProducer
 TOPOLOGY_NAME=KafkaPageViewProducer
 
-TOPIC="pageview"
+TOPIC="reach"
 WORKERS=4
 ACKERS=$WORKERS
 PENDING=200

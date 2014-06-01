@@ -5,19 +5,18 @@ import storm.trident.operation.BaseFunction;
 import storm.trident.operation.TridentCollector;
 import storm.trident.tuple.TridentTuple;
 
-import java.util.List;
+import java.util.Iterator;
 
-public class ExpandList extends BaseFunction {
+public class Expand extends BaseFunction {
 
   private static final long serialVersionUID = -8912233679276693760L;
 
   @Override
   public void execute(TridentTuple tuple, TridentCollector collector) {
-    List l = (List) tuple.getValue(0);
-    if (l != null) {
-      for (Object o : l) {
-        collector.emit(new Values(o));
-      }
+    Iterable iterable = (Iterable) tuple.getValue(0);
+    Iterator iterator = iterable.iterator();
+    while (iterator.hasNext()) {
+     collector.emit(new Values(iterator.next()));
     }
   }
 }

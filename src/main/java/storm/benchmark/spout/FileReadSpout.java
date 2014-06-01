@@ -50,10 +50,10 @@ public class FileReadSpout extends BaseRichSpout {
 	public void nextTuple() {
     if (ackEnabled) {
       collector.emit(new Values(reader.nextLine()), count);
+      count++;
     } else {
       collector.emit(new Values(reader.nextLine()));
     }
-    count++;
 	}
 
 	@Override

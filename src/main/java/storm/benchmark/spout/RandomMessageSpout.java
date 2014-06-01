@@ -64,10 +64,10 @@ public class RandomMessageSpout extends BaseRichSpout {
     final String message = messages[rand.nextInt(messages.length)];
     if(ackEnabled) {
       collector.emit(new Values(message), messageCount);
+      messageCount++;
     } else {
       collector.emit(new Values(message));
     }
-    messageCount++;
   }
 
 
