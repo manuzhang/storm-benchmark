@@ -50,7 +50,7 @@ public class BenchmarkRunnerTest {
             {"FileReadWordCount"}, {"storm.benchmark.topology.FileReadWordCount"},
             {"SOL"}, {"storm.benchmark.topology.SOL"},
             {"Grep"}, {"storm.benchmark.topology.Grep"},
-            {"PageView"}, {"storm.benchmark.topology.PageView"},
+            {"PageViewCount"}, {"storm.benchmark.topology.PageViewCount"},
             {"UniqueVisitor"}, {"storm.benchmark.topology.UniqueVisitor"},
             {"KafkaWordCount"}, {"storm.benchmark.topology.KafkaWordCount"},
             {"DRPC"}, {"storm.benchmark.topology.DRPC"},

@@ -2,9 +2,8 @@ wordcount
 sol
 rollingsort
 trident
-#uniquevisitor
-#pageview
-#grep
-#datacleaning
-#drpc
-#rollingcount
+uniquevisitor
+pageview
+grep
+dataclean
+drpc

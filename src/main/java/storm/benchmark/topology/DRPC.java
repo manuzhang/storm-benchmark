@@ -50,10 +50,14 @@ public class DRPC extends StormBenchmark {
   public static final String PAGE_NUM = "topology.component.page_bolt_num";
   public static final String VIEW_ID = "view";
   public static final String VIEW_NUM = "topology.component.view_bolt_num";
+  public static final String USER_NUM = "topology.component.user_bolt_num";
+  public static final String FOLLOWER_NUM = "topology.component.follower_bolt_num";
 
   private int spoutNum = 4;
   private int pageNum = 8;
   private int viewNum = 8;
+  private int userNum = 4;
+  private int followerNum = 4;
   private IPartitionedTridentSpout spout;
 
 
@@ -74,6 +78,8 @@ public class DRPC extends StormBenchmark {
     spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
     pageNum = BenchmarkUtils.getInt(options, PAGE_NUM, pageNum);
     viewNum = BenchmarkUtils.getInt(options, VIEW_NUM, viewNum);
+    userNum = BenchmarkUtils.getInt(options, USER_NUM, userNum);
+    followerNum = BenchmarkUtils.getInt(options, FOLLOWER_NUM, followerNum);
 
     spout = new TransactionalTridentKafkaSpout(
             KafkaUtils.getTridentKafkaConfig(options, new SchemeAsMultiScheme(new StringScheme())));
@@ -120,10 +126,10 @@ public class DRPC extends StormBenchmark {
             .each(new Fields("args"), new Print("args"), new Fields("url"))
             .groupBy(new Fields("url"))
             .stateQuery(urlToUsers, new Fields("url"), new MapGet(), new Fields("users"))
-            .each(new Fields("users"), new Expand(), new Fields("user"))
-         //   .groupBy(new Fields("user"))
+            .each(new Fields("users"), new Expand(), new Fields("user")).parallelismHint(userNum)
+            .groupBy(new Fields("user"))
             .stateQuery(userToFollowers, new Fields("user"), new MapGet(), new Fields("followers"))
-            .each(new Fields("followers"), new Expand(), new Fields("follower"))
+            .each(new Fields("followers"), new Expand(), new Fields("follower")).parallelismHint(followerNum)
             .groupBy(new Fields("follower"))
             .aggregate(new One(), new Fields("one"))
             .aggregate(new Fields("one"), new Sum(), new Fields("reach"));

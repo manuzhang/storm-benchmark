@@ -86,6 +86,6 @@ public class MetricsUtils {
 
   // MB per second
   public static double getThroughputMB(long throughputDiff, long timeDiff, int msgSize) {
-    return (0 == timeDiff) ? 0.0 : (throughputDiff * msgSize) / (timeDiff / 1000.0) / MB;
+    return (0 == timeDiff) ? 0.0 : (throughputDiff * msgSize) / (timeDiff / 1000.0) / (double) MB;
   }
 }
