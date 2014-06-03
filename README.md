@@ -29,9 +29,9 @@ They fall into two groups. The first group (wordcount, sol, rollingsort) are mea
 
 2. build with maven
 
-```bash
-  mvn install -DskipTests
-```
+  ```bash
+    mvn install -DskipTests
+  ```
 
 ## How to run
 
@@ -90,9 +90,9 @@ They fall into two groups. The first group (wordcount, sol, rollingsort) are mea
 
 4. run  
 
-```bash 
-  benchmark/bin/run-all.sh
-```
+  ```bash 
+    benchmark/bin/run-all.sh
+  ```
 
 
 
