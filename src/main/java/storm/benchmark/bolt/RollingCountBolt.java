@@ -48,6 +48,7 @@ public class RollingCountBolt extends RollingBolt {
     for (Entry<Object, Long> entry : counts.entrySet()) {
       Object obj = entry.getKey();
       Long count = entry.getValue();
+      LOG.debug("Object: " + obj + ", Count: " + count);
       collector.emit(new Values(obj, count));
     }
   }

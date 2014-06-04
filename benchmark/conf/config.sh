@@ -1,7 +1,7 @@
 #!/bin/sh
 
-APP_ID=application_1400224450350_0061
-JAR=/root/storm-benchmark-0.9.0-Intel-jar-with-dependencies.jar
+BIN=/usr/lib/storm/bin/storm
+JAR=/root/storm-benchmark-0.1.0-jar-with-dependencies.jar
 MAIN_CLASS=storm.benchmark.BenchmarkRunner
 
 METRICS_POLL_INTERVAL=60000 # 60 secs

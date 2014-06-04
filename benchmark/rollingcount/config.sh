@@ -1,7 +1,7 @@
 #!/bin/sh
 
-TOPOLOGY_CLASS=RollingSort
-TOPOLOGY_NAME=RollingSort
+TOPOLOGY_CLASS=RollingCount
+TOPOLOGY_NAME=RollingCount
 
 WORKERS=4
 ACKERS=$WORKERS

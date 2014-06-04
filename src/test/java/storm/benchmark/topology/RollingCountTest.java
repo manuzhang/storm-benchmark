@@ -12,15 +12,15 @@ import java.util.Map;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class RollingSortTest {
+public class RollingCountTest {
   private final Map options = new HashMap();
   private StormBenchmark benchmark;
 
   @BeforeTest
   public void setUp() {
-    benchmark = new RollingSort();
-    options.put(RollingSort.SPOUT_NUM, 4);
-    options.put(RollingSort.COUNTER_NUM, 3);
+    benchmark = new RollingCount();
+    options.put(RollingCount.SPOUT_NUM, 4);
+    options.put(RollingCount.COUNTER_NUM, 3);
   }
 
 
@@ -29,7 +29,7 @@ public class RollingSortTest {
     benchmark.parseOptions(options).buildTopology();
     StormTopology topology = benchmark.getTopology();
     assertThat(topology).isNotNull();
-    TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingSort.SPOUT_ID), 4);
-    TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingSort.COUNTER_ID), 3);
+    TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingCount.SPOUT_ID), 4);
+    TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingCount.COUNTER_ID), 3);
   }
 }

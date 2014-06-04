@@ -11,7 +11,7 @@ import storm.benchmark.util.BenchmarkUtils;
 
 import java.util.Map;
 
-public class RollingSort extends StormBenchmark {
+public class RollingCount extends StormBenchmark {
 
   private static final String WINDOW_LENGTH = "window.length";
   private static final String EMIT_FREQ = "emit.frequency";
