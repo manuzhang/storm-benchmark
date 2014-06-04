@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import storm.benchmark.metrics.IMetrics;
 import storm.benchmark.metrics.StormMetrics;
 import storm.benchmark.topology.FileReadWordCount;
-import storm.benchmark.topology.RollingSort;
+import storm.benchmark.topology.RollingCount;
 import storm.benchmark.topology.SOL;
 import storm.benchmark.topology.TridentWordCount;
 
@@ -35,7 +35,7 @@ public class StormBenchmarkTest {
     return new Object[][] {
             { new FileReadWordCount(), StormMetrics.class },
             { new SOL(), StormMetrics.class },
-            { new RollingSort(), StormMetrics.class },
+            { new RollingCount(), StormMetrics.class },
             { new TridentWordCount(), StormMetrics.class }
     };
   }

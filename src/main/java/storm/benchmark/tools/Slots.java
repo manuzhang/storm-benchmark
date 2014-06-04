@@ -53,7 +53,7 @@ public class Slots<K, V> implements Serializable {
 
   public V reduce(K obj) {
     if (!objToValues.containsKey(obj)) {
-      LOG.warn("the object is not contained");
+      LOG.warn("the object does not exist");
       return null;
     }
     Mutable<V>[] values = objToValues.get(obj);

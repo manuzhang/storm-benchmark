@@ -9,7 +9,7 @@ Currently, the benchmark consists 9 workloads.
 
 * wordcount 
 * sol
-* rollingsort
+* rollingcount
 * trident
 * uniquevisitor 
 * pageview
@@ -78,7 +78,7 @@ They fall into two groups. The first group (wordcount, sol, rollingsort) are mea
   ```bash
     wordcount
     #sol
-    #rollingsort
+    #rollingcount
     #trident
     #uniquevisitor
     #pageview

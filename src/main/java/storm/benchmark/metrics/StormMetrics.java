@@ -110,11 +110,11 @@ public class StormMetrics implements IMetrics {
 
     try {
       boolean live = true;
-      while (live && now < endTime) {
-        live = pollNimbus(getNimbusClient(), now, state, dataWriter);
+      do {
         Utils.sleep(pollInterval);
         now = System.currentTimeMillis();
-      }
+        live = pollNimbus(getNimbusClient(), now, state, dataWriter);
+      } while (live && now < endTime);
     } catch (Exception e) {
       LOG.error("storm metrics failed! ", e);
     } finally {

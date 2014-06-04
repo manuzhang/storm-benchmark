@@ -12,11 +12,11 @@ public class LongSummer implements Reducer<Long> {
 
   @Override
   public Long zero() {
-    return (long) 0;
+    return 0L;
   }
 
   @Override
   public boolean isZero(Long aLong) {
-    return (long) 0 == aLong;
+    return 0L == aLong;
   }
 }

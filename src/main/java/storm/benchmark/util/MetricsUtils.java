@@ -80,12 +80,12 @@ public class MetricsUtils {
   }
 
   // messages per second
-  public static double getThroughput(long throughputDiff, long timeDiff) {
-    return (0 == timeDiff) ? 0.0 : throughputDiff / (timeDiff / 1000.0);
+  public static double getThroughput(double throughputDiff, long timeDiff) {
+    return (0 == timeDiff) ? 0.0 : (throughputDiff / (timeDiff / 1000.0));
   }
 
   // MB per second
-  public static double getThroughputMB(long throughputDiff, long timeDiff, int msgSize) {
-    return (0 == timeDiff) ? 0.0 : (throughputDiff * msgSize) / (timeDiff / 1000.0) / (double) MB;
+  public static double getThroughputMB(double throughputDiff, long timeDiff, int msgSize) {
+    return (0 == timeDiff) ? 0.0 : ((throughputDiff * msgSize) / (timeDiff / 1000.0) / MB);
   }
 }

@@ -1,6 +1,7 @@
 package storm.benchmark;
 
 import backtype.storm.Config;
+import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
 import storm.benchmark.util.BenchmarkUtils;
 
@@ -63,7 +64,7 @@ public class BenchmarkConfig {
     if (null == ackers) {
       throw new RuntimeException("acker executors are null");
     }
-    return (Integer) ackers > 0;
+    return Utils.getInt(ackers) > 0;
   }
 
   private Map checkAndSetDefault(Map options) {
