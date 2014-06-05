@@ -1,11 +1,11 @@
-package storm.benchmark.bolt;
+package storm.benchmark.component.bolt;
 
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import storm.benchmark.bolt.common.RollingBolt;
+import storm.benchmark.component.bolt.common.RollingBolt;
 import storm.benchmark.reducer.SetReducer;
 import storm.benchmark.tools.SlidingWindow;
 
@@ -17,6 +17,9 @@ import java.util.Set;
 public class UniqueVisitorBolt extends RollingBolt {
 
   private static final long serialVersionUID = -6518481724698629167L;
+  public static final String FIELDS_URL = "url";
+  public static final String FIELD_UV = "unique_visitor";
+
   private final SlidingWindow<String, Set<Integer>> window;
   private final Map<String, Set<Integer>> cached;
 
@@ -56,7 +59,7 @@ public class UniqueVisitorBolt extends RollingBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("url", "unique_visitors"));
+    declarer.declare(new Fields(FIELDS_URL, FIELD_UV));
   }
 
 

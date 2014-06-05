@@ -1,5 +1,7 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
@@ -12,7 +14,6 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
@@ -34,49 +35,42 @@ public class Grep extends StormBenchmark {
   public static final String CM_NUM = "topology.component.count_bolt_num";
   public static final String PATTERN_STRING = "pattern_string";
 
-  // pattern string to grep
-  private static String ptnString = "string";
-  // number of spoutNum to run in parallel
-  private int spoutNum = 5;
-  // number of matching bolts to run in parallel
-  private int matBoltNum = 8;
-  // number of count bolts to run in parallel
-  private int cntBoltNum = 4;
+  public static final String DEFAULT_PATTERN_STR = "string";
+  public static final int DEFAULT_SPOUT_NUM = 5;
+  public static final int DEFAULT_MAT_BOLT_NUM = 8;
+  public static final int DEFAULT_CNT_BOLT_NUM = 4;
 
   private IRichSpout spout;
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
+  public StormTopology getTopology(Config config) {
 
-    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
-    matBoltNum = BenchmarkUtils.getInt(options, FM_NUM, matBoltNum);
-    cntBoltNum = BenchmarkUtils.getInt(options, CM_NUM, cntBoltNum);
-    ptnString = (String) Utils.get(options, PATTERN_STRING, ptnString);
+    final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int matBoltNum = BenchmarkUtils.getInt(config, FM_NUM, DEFAULT_MAT_BOLT_NUM);
+    final int cntBoltNum = BenchmarkUtils.getInt(config, CM_NUM, DEFAULT_CNT_BOLT_NUM);
+    final String ptnString = (String) Utils.get(config, PATTERN_STRING, DEFAULT_PATTERN_STR);
 
-    spout = new KafkaSpout(KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme())));
+    spout = new KafkaSpout(KafkaUtils.getSpoutConfig(config, new SchemeAsMultiScheme(new StringScheme())));
 
-    return this;
-  }
-
-  @Override
-  public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT_ID, spout, spoutNum);
-    builder.setBolt(FM_ID, new FindMatchingSentence(), matBoltNum)
+    builder.setBolt(FM_ID, new FindMatchingSentence(ptnString), matBoltNum)
             .localOrShuffleGrouping(SPOUT_ID);
     builder.setBolt(CM_ID, new CountMatchingSentence(), cntBoltNum)
             .fieldsGrouping(FM_ID, new Fields(FindMatchingSentence.FIELDS));
 
-    topology = builder.createTopology();
-
-    return this;
+    return builder.createTopology();
   }
 
   public static class FindMatchingSentence extends BaseBasicBolt {
     public static final String FIELDS = "word";
     private Pattern pattern;
     private Matcher matcher;
+    private final String ptnString;
+
+    public FindMatchingSentence(String ptnString) {
+      this.ptnString = ptnString;
+    }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context) {

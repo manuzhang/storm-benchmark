@@ -1,4 +1,4 @@
-package storm.benchmark.bolt;
+package storm.benchmark.component.bolt;
 
 import backtype.storm.Config;
 import backtype.storm.topology.BasicOutputCollector;

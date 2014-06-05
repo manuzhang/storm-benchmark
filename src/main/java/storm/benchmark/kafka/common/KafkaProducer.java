@@ -1,11 +1,13 @@
 package storm.benchmark.kafka.common;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.utils.Utils;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
+import storm.benchmark.metrics.IMetricsCollector;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.bolt.KafkaBolt;
@@ -26,40 +28,33 @@ public abstract class KafkaProducer extends StormBenchmark {
   public static final String BROKER_LIST = "broker.list";
   public static final String TOPIC = "topic";
 
-  // number of spoutNum to run in parallel
-  protected int spoutNum = 4;
-  // number of boltNum to run in parallel
-  protected int boltNum = 4;
+  public static final int DEFAULT_SPOUT_NUM = 4;
+  public static final int DEFAULT_BOLT_NUM = 4;
 
   protected IRichSpout spout;
   protected final IRichBolt bolt = new KafkaBolt<String, String>();
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
+  public StormTopology getTopology(Config config) {
+    config.putAll(getKafkaConfig(config));
 
-    Map stormConfig = config.getStormConfig();
-    stormConfig.putAll(getKafkaConfig(options));
+    final int spoutNum = BenchmarkUtils.getInt(config , SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int boltNum = BenchmarkUtils.getInt(config, BOLT_NUM, DEFAULT_BOLT_NUM);
 
-    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
-    boltNum = BenchmarkUtils.getInt(options, BOLT_NUM, boltNum);
-
-    return this;
-  }
-
-  @Override
-  public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT_ID, spout, spoutNum);
     builder.setBolt(BOLT_ID, bolt, boltNum).localOrShuffleGrouping(SPOUT_ID);
-    topology = builder.createTopology();
-    return this;
+    return builder.createTopology();
   }
 
   @Override
-  public IBenchmark startMetrics() {
-    // don't run metrics for producers
-    return this;
+  public IMetricsCollector getMetricsCollector(Config config, StormTopology topology) {
+    return new IMetricsCollector() {
+      @Override
+      public void collect() {
+        // we do not collect metrics for kafka producers
+      }
+    };
   }
 
   private Map getKafkaConfig(Map options) {

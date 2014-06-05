@@ -1,15 +1,14 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import storm.benchmark.BenchmarkConfig;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.bolt.ConstBolt;
-import storm.benchmark.spout.RandomMessageSpout;
+import storm.benchmark.component.bolt.ConstBolt;
+import storm.benchmark.component.spout.RandomMessageSpout;
 import storm.benchmark.util.BenchmarkUtils;
-
-import java.util.Map;
 
 /**
  * forked from https://github.com/yahoo/storm-perf-test
@@ -23,27 +22,21 @@ public class SOL extends StormBenchmark {
   public static final String BOLT_ID = "bolt";
   public static final String BOLT_NUM = "topology.component.bolt_num";
 
-  private int msgSize = 100;
-  private int numLevels = 2;
-  private int spoutNum = 4;
-  private int boltNum = 4;
+  public static final int DEFAULT_MESSAGE_SIZE = 100;
+  public static final int DEFAULT_NUM_LEVELS = 2;
+  public static final int DEFAULT_SPOUT_NUM = 4;
+  public static final int DEFAULT_BOLT_NUM = 4;
   private IRichSpout spout;
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
+  public StormTopology getTopology(Config config) {
+    final int numLevels = BenchmarkUtils.getInt(config, TOPOLOGY_LEVEL, DEFAULT_MESSAGE_SIZE);
+    final int msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, DEFAULT_NUM_LEVELS);
+    final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int boltNum = BenchmarkUtils.getInt(config, BOLT_NUM, DEFAULT_BOLT_NUM);
 
-    numLevels = BenchmarkUtils.getInt(options, TOPOLOGY_LEVEL, numLevels);
-    msgSize = BenchmarkUtils.getInt(options, BenchmarkConfig.MESSAGE_SIZE, msgSize);
-    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
-    boltNum = BenchmarkUtils.getInt(options, BOLT_NUM, boltNum);
+    spout = new RandomMessageSpout(msgSize, ifAckEnabled(config));
 
-    spout = new RandomMessageSpout(msgSize, config.ifAckEnabled());
-    return this;
-  }
-
-  @Override
-  public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
 
     builder.setSpout(SPOUT_ID, spout, spoutNum);
@@ -53,9 +46,8 @@ public class SOL extends StormBenchmark {
       builder.setBolt(BOLT_ID + levelNum, new ConstBolt(), boltNum)
         .localOrShuffleGrouping(BOLT_ID + (levelNum - 1));
     }
-    topology = builder.createTopology();
-
-    return this;
+   return builder.createTopology();
   }
+
 }
 

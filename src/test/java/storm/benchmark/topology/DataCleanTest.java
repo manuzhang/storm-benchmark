@@ -1,5 +1,6 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.Utils;
 import org.testng.annotations.BeforeTest;
@@ -7,27 +8,23 @@ import org.testng.annotations.Test;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.util.TestUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class DataCleanTest {
-  private final Map options = new HashMap();
+  private final Config config = new Config();
   private StormBenchmark benchmark;
 
   @BeforeTest
   public void setUp() {
     benchmark = new DataClean();
-    options.put(DataClean.SPOUT_NUM, 3);
-    options.put(DataClean.VIEW_NUM, 4);
-    options.put(DataClean.FILTER_NUM, 5);
+    config.put(DataClean.SPOUT_NUM, 3);
+    config.put(DataClean.VIEW_NUM, 4);
+    config.put(DataClean.FILTER_NUM, 5);
   }
 
   @Test
   public void testBuildTopology() {
-    benchmark.parseOptions(options).buildTopology();
-    StormTopology topology = benchmark.getTopology();
+    StormTopology topology = benchmark.getTopology(config);
     assertThat(topology).isNotNull();
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, DataClean.SPOUT_ID), 3);
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, DataClean.VIEW_ID), 4);

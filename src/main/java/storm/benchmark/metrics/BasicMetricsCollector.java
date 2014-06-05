@@ -13,10 +13,8 @@ import storm.benchmark.util.MetricsUtils;
 import java.io.PrintWriter;
 import java.util.*;
 
-public class StormMetrics implements IMetrics {
-  private static final Logger LOG = Logger.getLogger(StormMetrics.class);
-
-
+public class BasicMetricsCollector implements IMetricsCollector {
+  private static final Logger LOG = Logger.getLogger(BasicMetricsCollector.class);
 
   /* headers */
   public static final String TIME = "time(s)";
@@ -69,32 +67,24 @@ public class StormMetrics implements IMetrics {
   // metrics file path
   String path;
 
-  Map config;
+  Config config;
   StormTopology topology;
   String topoName;
   List<String> header = new LinkedList<String>();
   Map<String, String> metrics = new HashMap<String, String>();
 
-  @Override
-  public IMetrics setConfig(BenchmarkConfig benchConfig) {
-    config = Utils.readStormConfig();
+  public BasicMetricsCollector(Config config, StormTopology topology) {
+    this.config = config;
+    this.topology = topology;
     topoName = (String) Utils.get(config, Config.TOPOLOGY_NAME, BenchmarkConfig.DEFAULT_TOPOLOGY_NAME);
     pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL);
     totalTime = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, DEFAULT_TOTAL_TIME);
     msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, DEFAULT_MESSAGE_SIZE);
     path = (String) Utils.get(config, METRICS_PATH, DEFAULT_PATH);
-
-    return this;
   }
 
   @Override
-  public IMetrics setTopology(StormTopology topology) {
-    this.topology = topology;
-    return this;
-  }
-
-  @Override
-  public IMetrics start() {
+  public void collect() {
     long now = System.currentTimeMillis();
     long endTime = now + totalTime;
     MetricsState state = new MetricsState();
@@ -121,7 +111,6 @@ public class StormMetrics implements IMetrics {
       dataWriter.close();
       confWriter.close();
     }
-    return this;
   }
 
   public Nimbus.Client getNimbusClient() {

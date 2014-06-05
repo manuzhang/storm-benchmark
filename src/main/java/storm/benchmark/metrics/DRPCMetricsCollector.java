@@ -2,12 +2,14 @@ package storm.benchmark.metrics;
 
 
 /**
- * DRPCMetrics is meant to collect end-to-end latency for DRPC benchmarks
+ * DRPCMetricsCollector is meant to collect end-to-end latency for DRPC benchmarks
  * the latency is the time between DRPCClient submitting a query and
  * receiving the result
  */
 
+import backtype.storm.Config;
 import backtype.storm.generated.DRPCExecutionException;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.DRPCClient;
 import org.apache.log4j.Logger;
 import org.apache.thrift7.TException;
@@ -16,8 +18,8 @@ import storm.benchmark.util.FileUtils;
 import java.io.PrintWriter;
 import java.util.List;
 
-public class DRPCMetrics extends StormMetrics {
-  private static final Logger LOG = Logger.getLogger(DRPCMetrics.class);
+public class DRPCMetricsCollector extends BasicMetricsCollector {
+  private static final Logger LOG = Logger.getLogger(DRPCMetricsCollector.class);
 
   private final String function;
   private final List<String> args;
@@ -25,7 +27,9 @@ public class DRPCMetrics extends StormMetrics {
   private final int port;
   int index = 0;
 
-  public DRPCMetrics(String function, List<String> args, String server, int port) {
+  public DRPCMetricsCollector(Config config, StormTopology topology,
+                              String function, List<String> args, String server, int port) {
+    super(config, topology);
     this.function = function;
     this.args = args;
     this.server = server;
@@ -33,7 +37,7 @@ public class DRPCMetrics extends StormMetrics {
   }
 
   @Override
-  public StormMetrics start() {
+  public void collect() {
     long now = System.currentTimeMillis();
 
     final long endTime = now + totalTime;
@@ -62,7 +66,6 @@ public class DRPCMetrics extends StormMetrics {
     } catch (InterruptedException e) {
       LOG.error("interrupted", e);
     }
-    return this;
   }
 
   private String nextArg() {

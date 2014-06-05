@@ -1,12 +1,15 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Fields;
+import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.metrics.DRPCMetrics;
+import storm.benchmark.metrics.DRPCMetricsCollector;
+import storm.benchmark.metrics.IMetricsCollector;
 import storm.benchmark.tools.PageViewGenerator;
 import storm.benchmark.trident.operation.Distinct;
 import storm.benchmark.trident.operation.Expand;
@@ -53,43 +56,41 @@ public class DRPC extends StormBenchmark {
   public static final String USER_NUM = "topology.component.user_bolt_num";
   public static final String FOLLOWER_NUM = "topology.component.follower_bolt_num";
 
-  private int spoutNum = 4;
-  private int pageNum = 8;
-  private int viewNum = 8;
-  private int userNum = 4;
-  private int followerNum = 4;
+  public static final int DEFAULT_SPOUT_NUM = 4;
+  public static final int DEFAULT_PAGE_BOLT_NUM = 8;
+  public static final int DEFAULT_VIEW_BOLT_NUM = 8;
+  public static final int DEFAULT_USER_BOLT_NUM = 4;
+  public static final int DEFAULT_FOLLOWER_BOLT_NUM = 4;
+
   private IPartitionedTridentSpout spout;
 
+  private String server;
+  private int port;
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
+  public StormTopology getTopology(Config config) {
 
-    String server = (String) options.get(SERVER);
-    if (null == server) {
+    Object sObj = config.get(SERVER);
+    if (null == sObj) {
       throw new IllegalArgumentException("must set a drpc server");
     }
+    server = (String) sObj;
 
-    Integer port = (Integer) options.get(PORT);
-    if (null == port) {
+    Object pObj = config.get(PORT);
+    if (null == pObj) {
       throw new IllegalArgumentException("must set a drpc port");
     }
+    port = Utils.getInt(pObj);
 
-    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
-    pageNum = BenchmarkUtils.getInt(options, PAGE_NUM, pageNum);
-    viewNum = BenchmarkUtils.getInt(options, VIEW_NUM, viewNum);
-    userNum = BenchmarkUtils.getInt(options, USER_NUM, userNum);
-    followerNum = BenchmarkUtils.getInt(options, FOLLOWER_NUM, followerNum);
+    final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int pageNum = BenchmarkUtils.getInt(config, PAGE_NUM, DEFAULT_PAGE_BOLT_NUM);
+    final int viewNum = BenchmarkUtils.getInt(config, VIEW_NUM, DEFAULT_VIEW_BOLT_NUM);
+    final int userNum = BenchmarkUtils.getInt(config, USER_NUM, DEFAULT_USER_BOLT_NUM);
+    final int followerNum = BenchmarkUtils.getInt(config, FOLLOWER_NUM, DEFAULT_FOLLOWER_BOLT_NUM);
 
     spout = new TransactionalTridentKafkaSpout(
-            KafkaUtils.getTridentKafkaConfig(options, new SchemeAsMultiScheme(new StringScheme())));
-    metrics = new DRPCMetrics(FUNCTION, ARGS, server, port);
+            KafkaUtils.getTridentKafkaConfig(config, new SchemeAsMultiScheme(new StringScheme())));
 
-    return this;
-  }
-
-  @Override
-  public IBenchmark buildTopology() {
     TridentTopology trident = new TridentTopology();
     TridentState urlToUsers =
             trident.newStream("drpc", spout).parallelismHint(spoutNum).shuffle()
@@ -133,8 +134,12 @@ public class DRPC extends StormBenchmark {
             .groupBy(new Fields("follower"))
             .aggregate(new One(), new Fields("one"))
             .aggregate(new Fields("one"), new Sum(), new Fields("reach"));
-    topology = trident.build();
-    return this;
+    return trident.build();
+  }
+
+  @Override
+  public IMetricsCollector getMetricsCollector(Config config, StormTopology topology) {
+    return new DRPCMetricsCollector(config, topology, FUNCTION, ARGS, server, port);
   }
 
   public static class StaticSingleKeyMapState extends ReadOnlyState implements ReadOnlyMapState<Object> {

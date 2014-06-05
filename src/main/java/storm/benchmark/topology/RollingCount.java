@@ -1,15 +1,14 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.bolt.RollingCountBolt;
-import storm.benchmark.spout.FileReadSpout;
+import storm.benchmark.component.bolt.RollingCountBolt;
+import storm.benchmark.component.spout.FileReadSpout;
 import storm.benchmark.util.BenchmarkUtils;
-
-import java.util.Map;
 
 public class RollingCount extends StormBenchmark {
 
@@ -21,38 +20,27 @@ public class RollingCount extends StormBenchmark {
   public static final String COUNTER_ID = "rolling_counter";
   public static final String COUNTER_NUM = "topology.component.bolt_num";
 
-  // number of spoutNum to run in parallel
-  private int spoutNum = 4;
-  // number of rolling count bolts to run in parallel
-  private int rcBoltNum = 8;
-  // window length in seconds
-  private int winLen = 9;
-  // emit frequency in seconds
-  private int emitFreq = 3;
+  public static final int DEFAULT_SPOUT_NUM = 4;
+  public static final int DEFAULT_RC_BOLT_NUM = 8;
+  public static final int DEFAULT_WINDOW_LENGTH_IN_SECS = 9;   // 9s
+  public static final int DEFAULT_EMIT_FREQ_IN_SECS = 3; // 3s
 
   private IRichSpout spout;
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
+  public StormTopology getTopology(Config config) {
 
-    spoutNum = BenchmarkUtils.getInt(options, SPOUT_NUM, spoutNum);
-    rcBoltNum = BenchmarkUtils.getInt(options, COUNTER_NUM, rcBoltNum);
-    winLen = BenchmarkUtils.getInt(options, WINDOW_LENGTH, winLen);
-    emitFreq = BenchmarkUtils.getInt(options, EMIT_FREQ, emitFreq);
+    final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int rcBoltNum = BenchmarkUtils.getInt(config, COUNTER_NUM, DEFAULT_RC_BOLT_NUM);
+    final int windowLength = BenchmarkUtils.getInt(config, WINDOW_LENGTH, DEFAULT_WINDOW_LENGTH_IN_SECS);
+    final int emitFreq = BenchmarkUtils.getInt(config, EMIT_FREQ, DEFAULT_EMIT_FREQ_IN_SECS);
 
     spout = new FileReadSpout();
 
-    return this;
-  }
-
-  @Override
-  public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
 
     builder.setSpout(SPOUT_ID, spout, spoutNum);
-    builder.setBolt(COUNTER_ID, new RollingCountBolt(winLen, emitFreq), rcBoltNum).fieldsGrouping(SPOUT_ID, new Fields(FileReadSpout.FIELDS));
-    topology = builder.createTopology();
-    return this;
+    builder.setBolt(COUNTER_ID, new RollingCountBolt(windowLength, emitFreq), rcBoltNum).fieldsGrouping(SPOUT_ID, new Fields(FileReadSpout.FIELDS));
+    return builder.createTopology();
   }
 }

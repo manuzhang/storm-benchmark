@@ -1,4 +1,4 @@
-package storm.benchmark.bolt.common;
+package storm.benchmark.component.bolt.common;
 
 
 import backtype.storm.Config;

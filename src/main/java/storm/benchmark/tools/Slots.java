@@ -12,7 +12,7 @@ public class Slots<K, V> implements Serializable {
   private static final long serialVersionUID = 4858185737378394432L;
   private static final Logger LOG = Logger.getLogger(Slots.class);
 
-  private final Map<K, Mutable<V>[]> objToValues = new HashMap<K, Mutable<V>[]>();
+  private final Map<K, Mutable[]> objToValues = new HashMap<K, Mutable[]>();
   private final int numSlots;
   private final Reducer<V> reducer;
 
@@ -30,17 +30,11 @@ public class Slots<K, V> implements Serializable {
     }
     Mutable[] values = objToValues.get(obj);
     if (null == values) {
-      values = new Mutable[numSlots];
-
+      values = initSlots(numSlots);
       objToValues.put(obj, values);
     }
-    Mutable<V> mut = values[slot];
-    if (null == mut) {
-      mut = new Mutable(val);
-      values[slot] = mut;
-    } else {
-      mut.set(reducer.reduce(mut.get(), val));
-    }
+    Mutable mut = values[slot];
+    mut.set(reducer.reduce((V) mut.get(), val));
   }
 
   public Map<K, V> reduceByKey() {
@@ -56,13 +50,12 @@ public class Slots<K, V> implements Serializable {
       LOG.warn("the object does not exist");
       return null;
     }
-    Mutable<V>[] values = objToValues.get(obj);
+    Mutable[] values = objToValues.get(obj);
     final int len = values.length;
     V val = reducer.zero();
     for (int i = 0; i < len; i++) {
-      if (values[i] != null) {
-        val = reducer.reduce(val, values[i].get());
-      }
+      Mutable mut = values[i];
+      val = reducer.reduce(val, (V) mut.get());
     }
     return val;
   }
@@ -72,7 +65,7 @@ public class Slots<K, V> implements Serializable {
       throw new IllegalArgumentException("the range of slot must be [0, numSlots)");
     }
     for (K obj : objToValues.keySet()) {
-      Mutable<V> m = objToValues.get(obj)[slot];
+      Mutable m = objToValues.get(obj)[slot];
       if (m != null) {
         m.set(reducer.zero());
       }
@@ -91,7 +84,7 @@ public class Slots<K, V> implements Serializable {
     return objToValues.containsKey(obj);
   }
 
-  public Mutable<V>[] getValues(K obj) {
+  public Mutable[] getValues(K obj) {
     return objToValues.get(obj);
   }
 
@@ -101,5 +94,13 @@ public class Slots<K, V> implements Serializable {
 
   private boolean shouldBeRemoved(K obj) {
     return reducer.isZero(reduce(obj));
+  }
+
+  private Mutable[] initSlots(int numSlots) {
+    Mutable[] muts = new Mutable[numSlots];
+    for (int i = 0; i < numSlots; i++) {
+      muts[i] = new Mutable();
+    }
+    return muts;
   }
 }

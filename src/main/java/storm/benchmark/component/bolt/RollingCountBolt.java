@@ -1,4 +1,4 @@
-package storm.benchmark.bolt;
+package storm.benchmark.component.bolt;
 
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -6,7 +6,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.apache.log4j.Logger;
-import storm.benchmark.bolt.common.RollingBolt;
+import storm.benchmark.component.bolt.common.RollingBolt;
 import storm.benchmark.reducer.LongSummer;
 import storm.benchmark.tools.SlidingWindow;
 
@@ -21,6 +21,8 @@ public class RollingCountBolt extends RollingBolt {
 
   private static final long serialVersionUID = -903093673694769540L;
   private static final Logger LOG = Logger.getLogger(RollingCountBolt.class);
+  public static final String FIELDS_OBJ = "obj";
+  public static final String FIELDS_CNT = "count";
 
   private final SlidingWindow<Object, Long> window;
 
@@ -60,6 +62,6 @@ public class RollingCountBolt extends RollingBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("obj", "count"));
+    declarer.declare(new Fields(FIELDS_OBJ, FIELDS_CNT));
   }
 }

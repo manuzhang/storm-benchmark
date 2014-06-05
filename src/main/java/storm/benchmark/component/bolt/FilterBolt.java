@@ -1,4 +1,4 @@
-package storm.benchmark.bolt;
+package storm.benchmark.component.bolt;
 
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -8,8 +8,8 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class FilterBolt<T> extends BaseBasicBolt {
-
   private static final long serialVersionUID = -4957635695743420459L;
+  public static final String FIELDS = "filtered";
   private final T toFilter;
 
   public FilterBolt(T toFilter) {
@@ -25,7 +25,7 @@ public class FilterBolt<T> extends BaseBasicBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("filtered"));
+    declarer.declare(new Fields(FIELDS));
   }
 
   public static <F> boolean filter(Tuple input, F toFilter) {

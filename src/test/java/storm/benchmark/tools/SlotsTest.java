@@ -61,7 +61,7 @@ public class SlotsTest {
     Slots slots = new Slots<Object, Object>(ANY_REDUCER, numSlots);
     slots.add(ANY_OBJECT, ANY_VALUE, slot);
     assertThat(slots.contains(ANY_OBJECT)).isTrue();
-    Mutable<Object> m = slots.getValues(ANY_OBJECT)[slot];
+    Mutable m = slots.getValues(ANY_OBJECT)[slot];
     assertThat(m).isNotNull();
     assertThat(m.get()).isEqualTo(ANY_VALUE);
   }
@@ -115,7 +115,7 @@ public class SlotsTest {
     assertThat(slots.contains(ANY_OBJECT)).isTrue();
     assertThat(slots.getValues(ANY_OBJECT)[slot]).isNotNull();
     slots.wipeSlot(slot);
-    Mutable<Object> m = slots.getValues(ANY_OBJECT)[slot];
+    Mutable m = slots.getValues(ANY_OBJECT)[slot];
     assertThat(m).isNotNull();
     assertThat(ANY_REDUCER.isZero(m.get())).isTrue();
   }

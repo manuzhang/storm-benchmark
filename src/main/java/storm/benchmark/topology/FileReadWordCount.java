@@ -1,18 +1,15 @@
 package storm.benchmark.topology;
 
-import storm.benchmark.IBenchmark;
-import storm.benchmark.spout.FileReadSpout;
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
+import storm.benchmark.component.spout.FileReadSpout;
 import storm.benchmark.topology.common.WordCount;
-
-import java.util.Map;
 
 public class FileReadWordCount extends WordCount {
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
-
-    spout = new FileReadSpout(config.ifAckEnabled());
-    return this;
+  public StormTopology getTopology(Config config) {
+    spout = new FileReadSpout(ifAckEnabled(config));
+    return super.getTopology(config);
   }
 }

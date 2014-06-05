@@ -1,6 +1,5 @@
 package storm.benchmark;
 
-import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
 
 /**
@@ -21,10 +20,7 @@ public class BenchmarkRunner {
   }
 
   public static void run(IBenchmark benchmark) throws Exception {
-    benchmark.parseOptions(Utils.readCommandLineOpts())
-            .buildTopology()
-            .submit()
-            .startMetrics();
+    benchmark.run();
   }
 
   public static IBenchmark getBenchmarkFrom(Class clazz)

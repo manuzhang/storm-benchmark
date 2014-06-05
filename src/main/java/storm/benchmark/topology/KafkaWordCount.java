@@ -1,25 +1,18 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.topology.common.WordCount;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.KafkaSpout;
-import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
-
-import java.util.Map;
 
 public class KafkaWordCount extends WordCount {
 
-  private SpoutConfig kafkaConfig;
-
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
-
-    spout = new KafkaSpout(KafkaUtils.getSpoutConfig(options, new SchemeAsMultiScheme(new StringScheme())));
-
-    return this;
+  public StormTopology getTopology(Config config) {
+    spout = new KafkaSpout(KafkaUtils.getSpoutConfig(config, new SchemeAsMultiScheme(new StringScheme())));
+    return super.getTopology(config);
   }
 }
