@@ -25,5 +25,4 @@ TOPOLOGY_CONF=$TOPOLOGY_CONF,topology.name=$TOPOLOGY_NAME,topology.workers=$WORK
 
 
 echo "========== running WordCount =========="
-#run_benchmark
-run_topology
+run_benchmark
