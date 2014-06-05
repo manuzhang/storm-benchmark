@@ -2,8 +2,8 @@ wordcount
 sol
 rollingcount
 trident
-uniquevisitor
-pageview
 grep
-dataclean
 drpc
+pageview
+uniquevisitor
+dataclean
