@@ -6,7 +6,6 @@ import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.component.bolt.PageViewBolt;
 import storm.benchmark.component.bolt.UniqueVisitorBolt;
@@ -15,7 +14,7 @@ import storm.benchmark.util.KafkaUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.StringScheme;
 
-import static storm.benchmark.tools.PageView.Item;
+import static storm.benchmark.component.spout.pageview.PageView.Item;
 
 public class UniqueVisitor extends StormBenchmark {
   public final static String SPOUT_ID = "spout";

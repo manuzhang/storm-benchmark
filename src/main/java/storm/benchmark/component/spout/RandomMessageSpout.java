@@ -13,16 +13,17 @@ import java.util.Random;
 public class RandomMessageSpout extends BaseRichSpout {
 
   private static final long serialVersionUID = -4100642374496292646L;
-  private int sizeInBytes;
-  private long messageCount;
+  public static final String FIELDS = "message";
+
+  private final int sizeInBytes;
+  private long messageCount = 0;
   private SpoutOutputCollector collector;
   private String [] messages = null;
-  private boolean ackEnabled;
+  private final boolean ackEnabled;
   private Random rand = null;
 
   public RandomMessageSpout(int sizeInBytes, boolean ackEnabled) {
     this.sizeInBytes = sizeInBytes;
-    this.messageCount = 0;
     this.ackEnabled = ackEnabled;
   }
 
@@ -33,8 +34,6 @@ public class RandomMessageSpout extends BaseRichSpout {
     this.messages = new String[differentMessages];
     for(int i = 0; i < differentMessages; i++) {
       StringBuilder sb = new StringBuilder(sizeInBytes);
-      //Even though java encodes strings in UCS2, the serialized version sent by the tuples
-      // is UTF8, so it should be a single byte
       for(int j = 0; j < sizeInBytes; j++) {
         sb.append(rand.nextInt(9));
       }
@@ -57,6 +56,6 @@ public class RandomMessageSpout extends BaseRichSpout {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("message"));
+    declarer.declare(new Fields(FIELDS));
   }
 }

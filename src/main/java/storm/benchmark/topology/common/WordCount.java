@@ -13,7 +13,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.apache.log4j.Logger;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.trident.operation.WordSplit;
+import storm.benchmark.lib.operation.WordSplit;
 import storm.benchmark.util.BenchmarkUtils;
 
 import java.util.HashMap;

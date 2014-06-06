@@ -7,7 +7,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import org.apache.log4j.Logger;
-import storm.benchmark.tools.FileReader;
+import storm.benchmark.util.FileReader;
 
 import java.util.Map;
 
@@ -36,8 +36,12 @@ public class FileReadSpout extends BaseRichSpout {
   }
 
   public FileReadSpout(boolean ackEnabled, String file) {
+    this(ackEnabled, new FileReader(file));
+  }
+
+  public FileReadSpout(boolean ackEnabled, FileReader reader) {
     this.ackEnabled = ackEnabled;
-    this.reader = new FileReader(file);
+    this.reader = reader;
   }
 
 	@Override

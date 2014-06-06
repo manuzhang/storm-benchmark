@@ -23,11 +23,10 @@ public class BasicMetricsCollector implements IMetricsCollector {
   public static final String USED_SLOTS = "used_slots";
   public static final String WORKERS = "workers";
   public static final String TASKS = "tasks";
-  public static final String EXECUTORS = "total_executors";
-  public static final String EXECUTORS_METRICS = "executors_with_metrics";
-  public static final String TRANSFERRED = "overall_transferred (messages)";
-  public static final String THROUGHPUT = "overall_throughput (messages/s)";
-  public static final String THROUGHPUT_MB = "overall_throughput (MB/s)";
+  public static final String EXECUTORS = "executors";
+  public static final String TRANSFERRED = "transferred (messages)";
+  public static final String THROUGHPUT = "throughput (messages/s)";
+  public static final String THROUGHPUT_MB = "throughput (MB/s)";
   public static final String THROUGHPUT_MB_FORMAT = "%.1f";
   public static final String SPOUT_EXECUTORS = "spout_executors";
   public static final String SPOUT_TRANSFERRED = "spout_transferred (messages)";
@@ -181,20 +180,18 @@ public class BasicMetricsCollector implements IMetricsCollector {
     long overallTransferred = 0;
     long spoutTransferred = 0;
     long spoutAcked = 0;
-    int executorsWithMetircs = 0;
     int spoutExecutors = 0;
 
     Map<String, List<Double>> comLat = new HashMap<String, List<Double>>();
     for (ExecutorSummary es : info.get_executors()) {
       String id = es.get_component_id();
       LOG.debug("get ExecutorSummary of component: " + id);
-      if (Utils.isSystemId(id)) {
+/*      if (Utils.isSystemId(id)) {
         LOG.debug("skip system component: " + id);
         continue;
-      }
+      }*/
       ExecutorStats exeStats = es.get_stats();
       if (exeStats != null) {
-        executorsWithMetircs++;
         ExecutorSpecificStats specs = exeStats.get_specific();
         ComponentCommon common = Utils.getComponentCommon(topology, id);
         boolean isSpout = isSpout(specs);
@@ -240,7 +237,6 @@ public class BasicMetricsCollector implements IMetricsCollector {
               String.format(SPOUT_MAX_LATENCY_FORMAT, max));
 
     }
-    metrics.put(EXECUTORS_METRICS, Integer.toString(executorsWithMetircs));
     metrics.put(SPOUT_EXECUTORS, Integer.toString(spoutExecutors));
 
     long timeDiff = now - state.lastTime;
@@ -286,7 +282,6 @@ public class BasicMetricsCollector implements IMetricsCollector {
     header.add(WORKERS);
     header.add(TASKS);
     header.add(EXECUTORS);
-    header.add(EXECUTORS_METRICS);
     header.add(TRANSFERRED);
     header.add(THROUGHPUT);
     header.add(THROUGHPUT_MB);

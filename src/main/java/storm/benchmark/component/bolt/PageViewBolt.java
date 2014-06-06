@@ -6,8 +6,8 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import storm.benchmark.tools.PageView;
-import static storm.benchmark.tools.PageView.Item;
+import storm.benchmark.component.spout.pageview.PageView;
+import static storm.benchmark.component.spout.pageview.PageView.Item;
 
 /**
  * the incoming tuple has a single pageview field consisting

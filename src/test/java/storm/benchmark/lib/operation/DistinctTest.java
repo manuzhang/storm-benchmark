@@ -1,0 +1,48 @@
+package storm.benchmark.lib.operation;
+
+import com.google.common.collect.Sets;
+import org.testng.annotations.Test;
+import storm.trident.tuple.TridentTuple;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class DistinctTest {
+  private static final Set<Integer> ANY_INT_SET_ONE = Sets.newHashSet(1, 2, 3);
+  private static final Set<Integer> ANY_INT_SET_TWO = Sets.newHashSet(2, 3, 4);
+
+  private static final Distinct distinct = new Distinct();
+
+
+  @Test
+  public void testInit() throws Exception {
+    TridentTuple tuple = mock(TridentTuple.class);
+    when(tuple.getInteger(1)).thenReturn(1);
+    Set<Integer> init = distinct.init(tuple);
+    assertThat(init)
+            .isNotNull()
+            .hasSize(1)
+            .contains(1);
+  }
+
+  @Test
+  public void testCombine() throws Exception {
+    Set<Integer> combined = distinct.combine(ANY_INT_SET_ONE, ANY_INT_SET_TWO);
+    assertThat(combined)
+            .isNotNull()
+            .hasSize(4)
+            .contains(1, 2, 3, 4);
+  }
+
+  @Test
+  public void testZero() throws Exception {
+    assertThat(distinct.zero())
+            .isNotNull()
+            .isInstanceOf(HashSet.class)
+            .isEmpty();
+  }
+}

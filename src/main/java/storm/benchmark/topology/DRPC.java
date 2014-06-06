@@ -10,11 +10,11 @@ import org.apache.log4j.Logger;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.DRPCMetricsCollector;
 import storm.benchmark.metrics.IMetricsCollector;
-import storm.benchmark.tools.PageViewGenerator;
-import storm.benchmark.trident.operation.Distinct;
-import storm.benchmark.trident.operation.Expand;
-import storm.benchmark.trident.operation.One;
-import storm.benchmark.trident.operation.Print;
+import storm.benchmark.component.spout.pageview.PageViewGenerator;
+import storm.benchmark.lib.operation.Distinct;
+import storm.benchmark.lib.operation.Expand;
+import storm.benchmark.lib.operation.One;
+import storm.benchmark.lib.operation.Print;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.StringScheme;
@@ -35,8 +35,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static storm.benchmark.tools.PageView.Extract;
-import static storm.benchmark.tools.PageView.Item;
+import static storm.benchmark.component.spout.pageview.PageView.Extract;
+import static storm.benchmark.component.spout.pageview.PageView.Item;
 
 
 public class DRPC extends StormBenchmark {

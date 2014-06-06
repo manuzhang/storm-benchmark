@@ -5,7 +5,7 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.tuple.Fields;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.trident.operation.WordSplit;
+import storm.benchmark.lib.operation.WordSplit;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.StringScheme;

@@ -57,6 +57,10 @@ public abstract class KafkaProducer extends StormBenchmark {
     };
   }
 
+  public IRichSpout getSpout() {
+    return spout;
+  }
+
   private Map getKafkaConfig(Map options) {
     Map kafkaConfig = new HashMap();
     Map brokerConfig = new HashMap();

@@ -6,8 +6,8 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import storm.benchmark.component.bolt.common.RollingBolt;
-import storm.benchmark.reducer.SetReducer;
-import storm.benchmark.tools.SlidingWindow;
+import storm.benchmark.lib.reducer.SetReducer;
+import storm.benchmark.util.SlidingWindow;
 
 import java.util.HashMap;
 import java.util.HashSet;

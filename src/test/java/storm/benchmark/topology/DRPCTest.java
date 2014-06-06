@@ -23,7 +23,7 @@ public class DRPCTest {
   }
 
   @Test
-  public void testBuildTopology() {
+  public void getTopologyShouldSetComponentParallelism() {
     StormTopology topology = benchmark.getTopology(config);
     assertThat(topology).isNotNull();
  /*   TestUtils.verifyParallelism(Utils.getComponentCommon(topology, "spout0"), 3);

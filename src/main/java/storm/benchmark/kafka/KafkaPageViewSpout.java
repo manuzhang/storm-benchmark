@@ -1,15 +1,18 @@
 package storm.benchmark.kafka;
 
 import storm.benchmark.kafka.common.KafkaProducerSpout;
-import storm.benchmark.tools.PageViewGenerator;
+import storm.benchmark.component.spout.pageview.PageViewGenerator;
 
 public class KafkaPageViewSpout extends KafkaProducerSpout {
   private static final long serialVersionUID = 1772211150101656352L;
   private PageViewGenerator generator;
 
   public KafkaPageViewSpout() {
-    super();
     this.generator = new PageViewGenerator();
+  }
+
+  public KafkaPageViewSpout(PageViewGenerator generator) {
+    this.generator = generator;
   }
 
   @Override

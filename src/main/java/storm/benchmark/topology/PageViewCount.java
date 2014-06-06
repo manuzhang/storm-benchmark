@@ -14,7 +14,7 @@ import storm.benchmark.util.KafkaUtils;
 import storm.kafka.KafkaSpout;
 import storm.kafka.StringScheme;
 
-import static storm.benchmark.tools.PageView.Item;
+import static storm.benchmark.component.spout.pageview.PageView.Item;
 
 public class PageViewCount extends StormBenchmark {
   public static final String SPOUT_ID = "spout";

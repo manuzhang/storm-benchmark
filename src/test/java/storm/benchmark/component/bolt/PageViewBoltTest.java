@@ -7,12 +7,12 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import storm.benchmark.tools.PageView;
+import storm.benchmark.component.spout.pageview.PageView;
 import storm.benchmark.util.MockTupleHelpers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static storm.benchmark.tools.PageView.Item;
+import static storm.benchmark.component.spout.pageview.PageView.Item;
 
 public class PageViewBoltTest {
 

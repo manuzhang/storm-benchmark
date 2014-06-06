@@ -7,8 +7,8 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.apache.log4j.Logger;
 import storm.benchmark.component.bolt.common.RollingBolt;
-import storm.benchmark.reducer.LongSummer;
-import storm.benchmark.tools.SlidingWindow;
+import storm.benchmark.lib.reducer.LongSummer;
+import storm.benchmark.util.SlidingWindow;
 
 import java.util.Map;
 import java.util.Map.Entry;
