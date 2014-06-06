@@ -14,8 +14,6 @@ public class ConstBolt extends BaseBasicBolt {
   private static final long serialVersionUID = -5313598399155365865L;
   public static final String FIELDS = "message";
 
-
-
   public ConstBolt() {
   }
 
@@ -25,7 +23,7 @@ public class ConstBolt extends BaseBasicBolt {
 
   @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {
-    collector.emit(new Values(tuple.getString(0)));
+    collector.emit(new Values(tuple.getValue(0)));
   }
 
   @Override

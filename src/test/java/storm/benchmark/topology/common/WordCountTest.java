@@ -57,8 +57,8 @@ public class WordCountTest {
     for (String w : words) {
       when(tuple.getString(0)).thenReturn(w);
       bolt.execute(tuple, collector);
-      verify(collector, times(1)).emit(any(Values.class));
     }
+    verify(collector, times(3)).emit(any(Values.class));
 
     assertThat(bolt.counts.get("word")).isEqualTo(2);
     assertThat(bolt.counts.get("count")).isEqualTo(1);

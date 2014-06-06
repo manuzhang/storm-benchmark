@@ -5,7 +5,8 @@ import backtype.storm.generated.*;
 import backtype.storm.utils.NimbusClient;
 import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
-import storm.benchmark.BenchmarkConfig;
+import storm.benchmark.StormBenchmark;
+import storm.benchmark.component.spout.RandomMessageSpout;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.FileUtils;
 import storm.benchmark.util.MetricsUtils;
@@ -53,8 +54,7 @@ public class BasicMetricsCollector implements IMetricsCollector {
   public static final String METRICS_PATH = "metrics.path";
 
   public static final int DEFAULT_POLL_INTERVAL = 30 * 1000; // 30 secs
-  public static final int DEFAULT_TOTAL_TIME =  5 * 60 * 1000; // 5 mins
-  public static final int DEFAULT_MESSAGE_SIZE = 100; // 100 bytes
+  public static final int DEFAULT_TOTAL_TIME = 5 * 60 * 1000; // 5 mins
   public static final String DEFAULT_PATH = "/root/";
 
   // How often should metrics be collected
@@ -69,21 +69,39 @@ public class BasicMetricsCollector implements IMetricsCollector {
   Config config;
   StormTopology topology;
   String topoName;
-  List<String> header = new LinkedList<String>();
+  Set<String> header = new LinkedHashSet<String>();
   Map<String, String> metrics = new HashMap<String, String>();
+  Set<MetricsItem> items = new HashSet<MetricsItem>();
+  final boolean collectSupervisorStats;
+  final boolean collectTopologyStats;
+  final boolean collectExecutorStats;
+  final boolean collectThroughput;
+  final boolean collectThroughputMB;
+  final boolean collectSpoutThroughput;
+  final boolean collectSpoutLatency;
 
-  public BasicMetricsCollector(Config config, StormTopology topology) {
+  public BasicMetricsCollector(Config config, StormTopology topology, Set<MetricsItem> items) {
     this.config = config;
     this.topology = topology;
-    topoName = (String) Utils.get(config, Config.TOPOLOGY_NAME, BenchmarkConfig.DEFAULT_TOPOLOGY_NAME);
+    this.items = items;
+    topoName = (String) Utils.get(config, Config.TOPOLOGY_NAME, StormBenchmark.DEFAULT_TOPOLOGY_NAME);
     pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL);
     totalTime = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, DEFAULT_TOTAL_TIME);
-    msgSize = BenchmarkUtils.getInt(config, BenchmarkConfig.MESSAGE_SIZE, DEFAULT_MESSAGE_SIZE);
     path = (String) Utils.get(config, METRICS_PATH, DEFAULT_PATH);
+    collectSupervisorStats = collectSupervisorStats();
+    collectTopologyStats = collectTopologyStats();
+    collectExecutorStats = collectExecutorStats();
+    collectThroughput = collectThroughput();
+    collectThroughputMB = collectThroughputMB();
+    collectSpoutThroughput = collectSpoutThroughput();
+    collectSpoutLatency = collectSpoutLatency();
+    if (collectThroughputMB) {
+      msgSize = BenchmarkUtils.getInt(config, RandomMessageSpout.MESSAGE_SIZE, RandomMessageSpout.DEFAULT_MESSAGE_SIZE);
+    }
   }
 
   @Override
-  public void collect() {
+  public void run() {
     long now = System.currentTimeMillis();
     long endTime = now + totalTime;
     MetricsState state = new MetricsState();
@@ -136,7 +154,9 @@ public class BasicMetricsCollector implements IMetricsCollector {
       return false;
     }
 
-    updateSupervisorStats(cs);
+    if (collectSupervisorStats) {
+      updateSupervisorStats(cs);
+    }
 
     TopologySummary ts = MetricsUtils.getTopologySummary(cs, topoName);
     if (null == ts) {
@@ -144,9 +164,14 @@ public class BasicMetricsCollector implements IMetricsCollector {
       return false;
     }
 
-    updateTopologyStats(ts, state, now);
-    TopologyInfo info = client.getTopologyInfo(ts.get_id());
-    updateExecutorStats(info, state, now);
+    if (collectTopologyStats) {
+      updateTopologyStats(ts, state, now);
+    }
+
+    if (collectExecutorStats) {
+      TopologyInfo info = client.getTopologyInfo(ts.get_id());
+      updateExecutorStats(info, state, now);
+    }
 
     writeLine(writer);
     state.lastTime = now;
@@ -223,21 +248,22 @@ public class BasicMetricsCollector implements IMetricsCollector {
         LOG.warn("executor stats not found for component: " + id);
       }
     }
-    if (comLat.isEmpty()) {
-      metrics.put(SPOUT_AVG_COMPLETE_LATENCY, "0.0");
-      metrics.put(SPOUT_MAX_COMPLETE_LATENCY, "0.0");
-    }
-    for (String id : comLat.keySet()) {
-      List<Double> latList = comLat.get(id);
-      double avg = null == latList ? 0.0 : BenchmarkUtils.avg(latList);
-      double max = null == latList ? 0.0 : BenchmarkUtils.max(latList);
-      metrics.put(SPOUT_AVG_COMPLETE_LATENCY,
-              String.format(SPOUT_AVG_LATENCY_FORMAT, avg));
-      metrics.put(SPOUT_MAX_COMPLETE_LATENCY,
-              String.format(SPOUT_MAX_LATENCY_FORMAT, max));
+    if (collectSpoutLatency) {
+      if (comLat.isEmpty()) {
+        metrics.put(SPOUT_AVG_COMPLETE_LATENCY, "0.0");
+        metrics.put(SPOUT_MAX_COMPLETE_LATENCY, "0.0");
+      }
+      for (String id : comLat.keySet()) {
+        List<Double> latList = comLat.get(id);
+        double avg = null == latList ? 0.0 : BenchmarkUtils.avg(latList);
+        double max = null == latList ? 0.0 : BenchmarkUtils.max(latList);
+        metrics.put(SPOUT_AVG_COMPLETE_LATENCY,
+                String.format(SPOUT_AVG_LATENCY_FORMAT, avg));
+        metrics.put(SPOUT_MAX_COMPLETE_LATENCY,
+                String.format(SPOUT_MAX_LATENCY_FORMAT, max));
 
+      }
     }
-    metrics.put(SPOUT_EXECUTORS, Integer.toString(spoutExecutors));
 
     long timeDiff = now - state.lastTime;
     long overallDiff = overallTransferred - state.overallTransferred;
@@ -246,20 +272,28 @@ public class BasicMetricsCollector implements IMetricsCollector {
     double throughputMB = (long) MetricsUtils.getThroughputMB(overallDiff, timeDiff, msgSize);
     long spoutThroughput = (long) MetricsUtils.getThroughput(spoutDiff, timeDiff);
     double spoutThroughputMB = (long) MetricsUtils.getThroughputMB(spoutDiff, timeDiff, msgSize);
-    metrics.put(TRANSFERRED, Long.toString(overallDiff));
-    metrics.put(THROUGHPUT, Long.toString(throughput));
-    metrics.put(THROUGHPUT_MB, String.format(THROUGHPUT_MB_FORMAT, throughputMB));
-    metrics.put(SPOUT_TRANSFERRED, Long.toString(spoutDiff));
-    metrics.put(SPOUT_ACKED, Long.toString(spoutAcked));
-    metrics.put(SPOUT_THROUGHPUT, Long.toString(spoutThroughput));
-    metrics.put(SPOUT_THROUGHPUT_MB,
-            String.format(SPOUT_THROUGHPUT_MB_FORMAT, spoutThroughputMB));
+    if (collectThroughput) {
+      metrics.put(TRANSFERRED, Long.toString(overallDiff));
+      metrics.put(THROUGHPUT, Long.toString(throughput));
+    }
+    if (collectThroughputMB) {
+      metrics.put(THROUGHPUT_MB, String.format(THROUGHPUT_MB_FORMAT, throughputMB));
+    }
+    if (collectSpoutThroughput) {
+      metrics.put(SPOUT_EXECUTORS, Integer.toString(spoutExecutors));
+      metrics.put(SPOUT_TRANSFERRED, Long.toString(spoutDiff));
+      metrics.put(SPOUT_ACKED, Long.toString(spoutAcked));
+      metrics.put(SPOUT_THROUGHPUT, Long.toString(spoutThroughput));
+    }
+    if (collectThroughputMB) {
+      metrics.put(SPOUT_THROUGHPUT_MB,
+              String.format(SPOUT_THROUGHPUT_MB_FORMAT, spoutThroughputMB));
 
+    }
 
     state.overallTransferred = overallTransferred;
     state.spoutTransferred = spoutTransferred;
   }
-
 
 
   boolean isSpout(ExecutorSpecificStats specs) {
@@ -277,21 +311,45 @@ public class BasicMetricsCollector implements IMetricsCollector {
 
   void writeHeader(PrintWriter writer) {
     header.add(TIME);
-    header.add(TOTAl_SLOTS);
-    header.add(USED_SLOTS);
-    header.add(WORKERS);
-    header.add(TASKS);
-    header.add(EXECUTORS);
-    header.add(TRANSFERRED);
-    header.add(THROUGHPUT);
-    header.add(THROUGHPUT_MB);
-    header.add(SPOUT_EXECUTORS);
-    header.add(SPOUT_TRANSFERRED);
-    header.add(SPOUT_ACKED);
-    header.add(SPOUT_THROUGHPUT);
-    header.add(SPOUT_THROUGHPUT_MB);
-    header.add(SPOUT_AVG_COMPLETE_LATENCY);
-    header.add(SPOUT_MAX_COMPLETE_LATENCY);
+
+    if (collectSupervisorStats()) {
+      header.add(TOTAl_SLOTS);
+      header.add(USED_SLOTS);
+    }
+
+    if (collectTopologyStats()) {
+      header.add(WORKERS);
+      header.add(TASKS);
+      header.add(EXECUTORS);
+    }
+
+    if (collectThroughput()) {
+      header.add(TRANSFERRED);
+      header.add(THROUGHPUT);
+    }
+
+    if (collectThroughputMB()) {
+      header.add(THROUGHPUT_MB);
+    }
+
+
+    if (collectSpoutThroughput()) {
+      header.add(SPOUT_EXECUTORS);
+      header.add(SPOUT_TRANSFERRED);
+      header.add(SPOUT_ACKED);
+      header.add(SPOUT_THROUGHPUT);
+    }
+
+    if (collectThroughputMB()) {
+      header.add(SPOUT_THROUGHPUT_MB);
+    }
+
+
+    if (collectSpoutLatency()) {
+      header.add(SPOUT_AVG_COMPLETE_LATENCY);
+      header.add(SPOUT_MAX_COMPLETE_LATENCY);
+    }
+
     LOG.info("writing out metrics headers into .csv file");
     writer.println(Utils.join(header, ","));
     writer.flush();
@@ -306,6 +364,45 @@ public class BasicMetricsCollector implements IMetricsCollector {
     writer.println(Utils.join(line, ","));
     writer.flush();
   }
+
+
+  boolean collectSupervisorStats() {
+    return items.contains(MetricsItem.ALL) ||
+            items.contains(MetricsItem.SUPERVISOR_STATS);
+  }
+
+  boolean collectTopologyStats() {
+    return items.contains(MetricsItem.TOPOLOGY_STATS);
+  }
+
+  boolean collectExecutorStats() {
+    return items.contains(MetricsItem.ALL) ||
+            items.contains(MetricsItem.THROUGHPUT) ||
+            items.contains(MetricsItem.THROUGHPUT_IN_MB) ||
+            items.contains(MetricsItem.SPOUT_THROUGHPUT) ||
+            items.contains(MetricsItem.SPOUT_LATENCY);
+  }
+
+  boolean collectThroughput() {
+    return items.contains(MetricsItem.ALL) ||
+            items.contains(MetricsItem.THROUGHPUT);
+  }
+
+  boolean collectThroughputMB() {
+    return items.contains(MetricsItem.ALL) ||
+            items.contains(MetricsItem.THROUGHPUT_IN_MB);
+  }
+
+  boolean collectSpoutThroughput() {
+    return items.contains(MetricsItem.ALL) ||
+            items.contains(MetricsItem.SPOUT_THROUGHPUT);
+  }
+
+  boolean collectSpoutLatency() {
+    return items.contains(MetricsItem.ALL) ||
+            items.contains(MetricsItem.SPOUT_LATENCY);
+  }
+
 
   static class MetricsState {
     long overallTransferred = 0;

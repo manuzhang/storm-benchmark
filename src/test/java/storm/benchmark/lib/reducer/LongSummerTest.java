@@ -11,8 +11,8 @@ public class LongSummerTest {
   private static final long NON_ZERO = 1L;
 
   @Test(dataProvider = "getLong")
-  public void testReduce() {
-    assertThat(summer.reduce(1L, 2L)).isEqualTo(3L);
+  public void testReduce(long v1, long v2, long sum) {
+    assertThat(summer.reduce(v1, v2)).isEqualTo(sum);
   }
 
   @DataProvider

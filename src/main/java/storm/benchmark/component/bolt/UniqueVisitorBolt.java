@@ -23,6 +23,10 @@ public class UniqueVisitorBolt extends RollingBolt {
   private final SlidingWindow<String, Set<Integer>> window;
   private final Map<String, Set<Integer>> cached;
 
+  public UniqueVisitorBolt() {
+    this(DEFAULT_SLIDING_WINDOW_IN_SECONDS, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
+  }
+
   public UniqueVisitorBolt(int winLen, int emitFreq) {
     super(winLen, emitFreq);
     window = new SlidingWindow<String, Set<Integer>>(new SetReducer<Integer>(), getWindowChunks());

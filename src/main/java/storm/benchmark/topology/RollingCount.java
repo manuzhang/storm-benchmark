@@ -7,6 +7,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.component.bolt.RollingCountBolt;
+import storm.benchmark.component.bolt.common.RollingBolt;
 import storm.benchmark.component.spout.FileReadSpout;
 import storm.benchmark.util.BenchmarkUtils;
 
@@ -22,8 +23,6 @@ public class RollingCount extends StormBenchmark {
 
   public static final int DEFAULT_SPOUT_NUM = 4;
   public static final int DEFAULT_RC_BOLT_NUM = 8;
-  public static final int DEFAULT_WINDOW_LENGTH_IN_SECS = 9;   // 9s
-  public static final int DEFAULT_EMIT_FREQ_IN_SECS = 3; // 3s
 
   private IRichSpout spout;
 
@@ -32,8 +31,10 @@ public class RollingCount extends StormBenchmark {
 
     final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
     final int rcBoltNum = BenchmarkUtils.getInt(config, COUNTER_NUM, DEFAULT_RC_BOLT_NUM);
-    final int windowLength = BenchmarkUtils.getInt(config, WINDOW_LENGTH, DEFAULT_WINDOW_LENGTH_IN_SECS);
-    final int emitFreq = BenchmarkUtils.getInt(config, EMIT_FREQ, DEFAULT_EMIT_FREQ_IN_SECS);
+    final int windowLength = BenchmarkUtils.getInt(config, WINDOW_LENGTH,
+            RollingBolt.DEFAULT_SLIDING_WINDOW_IN_SECONDS);
+    final int emitFreq = BenchmarkUtils.getInt(config, EMIT_FREQ,
+            RollingBolt.DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
 
     spout = new FileReadSpout();
 

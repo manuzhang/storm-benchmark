@@ -2,7 +2,7 @@ package storm.benchmark.topology;
 
 import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import storm.benchmark.StormBenchmark;
 
@@ -12,7 +12,7 @@ public class DRPCTest {
   private final Config config = new Config();
   private StormBenchmark benchmark;
 
-  @BeforeTest
+  @BeforeMethod
   public void setUp() {
     benchmark = new DRPC();
     config.put(DRPC.SERVER, "localhost");

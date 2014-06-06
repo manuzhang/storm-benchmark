@@ -44,7 +44,7 @@ public class SlotsTest {
   }
 
   @Test (expectedExceptions = IllegalArgumentException.class, dataProvider = "illegalSlot")
-  public void addToSlotEqOrGtNumSlotsShouldThrowIAE(int numSlots, int slot) {
+  public void addToIllegalSlotShouldThrowIAE(int numSlots, int slot) {
     Slots slots = new Slots<Object, Object>(ANY_REDUCER, numSlots);
     slots.add(ANY_OBJECT, ANY_VALUE, slot);
   }
@@ -58,7 +58,7 @@ public class SlotsTest {
 
 
   @Test (dataProvider = "legalSlot")
-  public void addToSlotLtNumSlotsShouldBeValid(int numSlots, int slot) {
+  public void addToLegalSlotShouldSucceed(int numSlots, int slot) {
     Slots slots = new Slots<Object, Object>(ANY_REDUCER, numSlots);
     slots.add(ANY_OBJECT, ANY_VALUE, slot);
     assertThat(slots.contains(ANY_OBJECT)).isTrue();
@@ -74,20 +74,6 @@ public class SlotsTest {
     };
   }
 
-  @Test
-  public void reduceShouldBeCalledOnSecondAndLaterAdd() {
-    Slots slots = new Slots<Object, Object>(ANY_REDUCER, ANY_NUM_SLOTS);
-    slots.add(ANY_OBJECT, ANY_VALUE, ANY_SLOT);
-    verifyZeroInteractions(ANY_REDUCER);
-
-    slots.add(ANY_OBJECT, ANY_VALUE, ANY_SLOT);
-    verify(ANY_REDUCER, times(1)).reduce(any(Object.class), any(Object.class));
-
-    for (int i = 1; i < 10; i++) {
-      slots.add(ANY_OBJECT, ANY_VALUE, ANY_SLOT);
-      verify(ANY_REDUCER, times(i + 1)).reduce(any(Object.class), any(Object.class));
-    }
-  }
 
   @Test
   public void wipeZerosShouldRemoveObjWhoseReducedValueIsZero() {

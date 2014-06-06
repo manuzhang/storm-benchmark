@@ -31,11 +31,12 @@ public class Slots<K, V> implements Serializable {
     }
     MutableObject[] values = objToValues.get(obj);
     if (null == values) {
-      values = initSlots(numSlots);
+      values = initSlots(numSlots, slot, val);
       objToValues.put(obj, values);
+    } else {
+      MutableObject mut = values[slot];
+      mut.setObject(reducer.reduce((V) mut.getObject(), val));
     }
-    MutableObject mut = values[slot];
-    mut.setObject(reducer.reduce((V) mut.getObject(), val));
   }
 
   public Map<K, V> reduceByKey() {
@@ -97,10 +98,14 @@ public class Slots<K, V> implements Serializable {
     return reducer.isZero(reduce(obj));
   }
 
-  private MutableObject[] initSlots(int numSlots) {
+  private MutableObject[] initSlots(int numSlots, int slot, V val) {
     MutableObject[] muts = new MutableObject[numSlots];
     for (int i = 0; i < numSlots; i++) {
-      muts[i] = new MutableObject();
+      if (i == slot) {
+        muts[i] = new MutableObject(val);
+      } else {
+        muts[i] = new MutableObject(reducer.zero());
+      }
     }
     return muts;
   }

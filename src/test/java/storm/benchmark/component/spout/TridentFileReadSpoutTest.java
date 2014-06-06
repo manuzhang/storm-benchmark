@@ -1,7 +1,7 @@
 package storm.benchmark.component.spout;
 
 import backtype.storm.tuple.Values;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import storm.benchmark.util.FileReader;
 import storm.trident.operation.TridentCollector;
@@ -19,7 +19,7 @@ public class TridentFileReadSpoutTest {
   private TridentFileReadSpout spout;
   private TridentCollector collector;
 
-  @BeforeTest
+  @BeforeMethod
   public void setUp() {
     reader = mock(FileReader.class);
     spout = new TridentFileReadSpout(10, reader);
@@ -39,8 +39,8 @@ public class TridentFileReadSpoutTest {
             .hasSize(2)
             .containsKey(0L)
             .containsKey(1L);
-    assertThat(batches.get(0)).hasSize(10);
-    assertThat(batches.get(1)).hasSize(10);
+    assertThat(batches.get(0L)).hasSize(10);
+    assertThat(batches.get(1L)).hasSize(10);
   }
 
   @Test
@@ -49,7 +49,7 @@ public class TridentFileReadSpoutTest {
     Map<Long, List<String>> batches = spout.getBatches();
     assertThat(batches).containsKey(0L);
 
-    spout.ack(0);
+    spout.ack(0L);
     assertThat(batches).isEmpty();
   }
 

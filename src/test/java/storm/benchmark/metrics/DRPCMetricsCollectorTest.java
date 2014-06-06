@@ -1,6 +1,6 @@
 package storm.benchmark.metrics;
 
-public class DRPCMetricsTest {
+public class DRPCMetricsCollectorTest {
 
   // TODO: add implementations
 }

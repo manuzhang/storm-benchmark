@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.DRPCMetricsCollector;
 import storm.benchmark.metrics.IMetricsCollector;
-import storm.benchmark.component.spout.pageview.PageViewGenerator;
+import storm.benchmark.util.PageViewGenerator;
 import storm.benchmark.lib.operation.Distinct;
 import storm.benchmark.lib.operation.Expand;
 import storm.benchmark.lib.operation.One;

@@ -24,6 +24,6 @@ public class OneTest {
 
   @Test
   public void testZero() throws Exception {
-    assertThat(one.zero()).isEqualTo(0);
+    assertThat(one.zero()).isEqualTo(1);
   }
 }

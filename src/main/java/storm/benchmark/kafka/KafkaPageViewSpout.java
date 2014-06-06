@@ -1,7 +1,7 @@
 package storm.benchmark.kafka;
 
 import storm.benchmark.kafka.common.KafkaProducerSpout;
-import storm.benchmark.component.spout.pageview.PageViewGenerator;
+import storm.benchmark.util.PageViewGenerator;
 
 public class KafkaPageViewSpout extends KafkaProducerSpout {
   private static final long serialVersionUID = 1772211150101656352L;

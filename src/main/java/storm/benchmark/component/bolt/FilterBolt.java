@@ -28,7 +28,7 @@ public class FilterBolt<T> extends BaseBasicBolt {
     declarer.declare(new Fields(FIELDS));
   }
 
-  public static <F> boolean filter(Tuple input, F toFilter) {
-    return toFilter.equals((F) input.getValue(0));
+  public static <T> boolean filter(Tuple input, T toFilter) {
+    return toFilter.equals(input.getValue(0));
   }
 }

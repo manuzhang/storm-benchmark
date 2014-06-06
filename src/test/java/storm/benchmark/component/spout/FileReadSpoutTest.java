@@ -5,7 +5,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import storm.benchmark.util.FileReader;
 
@@ -25,7 +25,7 @@ public class FileReadSpoutTest {
   private SpoutOutputCollector collector;
   private FileReader reader;
 
-  @BeforeTest
+  @BeforeMethod
   public void setUp() {
     declarer = mock(OutputFieldsDeclarer.class);
     collector = mock(SpoutOutputCollector.class);

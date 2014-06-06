@@ -51,7 +51,7 @@ public abstract class KafkaProducer extends StormBenchmark {
   public IMetricsCollector getMetricsCollector(Config config, StormTopology topology) {
     return new IMetricsCollector() {
       @Override
-      public void collect() {
+      public void run() {
         // we do not collect metrics for kafka producers
       }
     };

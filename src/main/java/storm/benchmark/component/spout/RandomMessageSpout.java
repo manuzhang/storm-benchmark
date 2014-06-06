@@ -14,6 +14,8 @@ public class RandomMessageSpout extends BaseRichSpout {
 
   private static final long serialVersionUID = -4100642374496292646L;
   public static final String FIELDS = "message";
+  public static final String MESSAGE_SIZE = "message.size";
+  public static final int DEFAULT_MESSAGE_SIZE = 100;
 
   private final int sizeInBytes;
   private long messageCount = 0;
@@ -21,6 +23,10 @@ public class RandomMessageSpout extends BaseRichSpout {
   private String [] messages = null;
   private final boolean ackEnabled;
   private Random rand = null;
+
+  public RandomMessageSpout(boolean ackEnabled) {
+    this(DEFAULT_MESSAGE_SIZE, ackEnabled);
+  }
 
   public RandomMessageSpout(int sizeInBytes, boolean ackEnabled) {
     this.sizeInBytes = sizeInBytes;

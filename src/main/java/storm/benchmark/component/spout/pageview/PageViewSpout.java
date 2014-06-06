@@ -6,6 +6,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import storm.benchmark.util.PageViewGenerator;
 
 import java.util.Map;
 
@@ -14,12 +15,18 @@ public class PageViewSpout extends BaseRichSpout {
   public static final String FIELDS = "page_view";
 
   private SpoutOutputCollector collector;
-  private final PageViewGenerator generator = new PageViewGenerator();
+  private final PageViewGenerator generator;
   private final boolean ackEnabled;
   private long count = 0;
 
   public PageViewSpout(boolean ackEnabled) {
     this.ackEnabled = ackEnabled;
+    this.generator = new PageViewGenerator();
+  }
+
+  public PageViewSpout(boolean ackEnabled, PageViewGenerator generator) {
+    this.ackEnabled = ackEnabled;
+    this.generator = generator;
   }
 
   @Override

@@ -16,6 +16,7 @@ import org.apache.thrift7.TException;
 import storm.benchmark.util.FileUtils;
 
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.List;
 
 public class DRPCMetricsCollector extends BasicMetricsCollector {
@@ -29,7 +30,7 @@ public class DRPCMetricsCollector extends BasicMetricsCollector {
 
   public DRPCMetricsCollector(Config config, StormTopology topology,
                               String function, List<String> args, String server, int port) {
-    super(config, topology);
+    super(config, topology, new HashSet<MetricsItem>());
     this.function = function;
     this.args = args;
     this.server = server;
@@ -37,7 +38,7 @@ public class DRPCMetricsCollector extends BasicMetricsCollector {
   }
 
   @Override
-  public void collect() {
+  public void run() {
     long now = System.currentTimeMillis();
 
     final long endTime = now + totalTime;

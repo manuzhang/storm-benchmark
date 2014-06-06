@@ -1,4 +1,4 @@
-package storm.benchmark.component.bolt;
+package storm.benchmark.component.bolt.common;
 
 import backtype.storm.Config;
 import backtype.storm.topology.BasicOutputCollector;
@@ -6,7 +6,10 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import storm.benchmark.component.bolt.RollingCountBolt;
+import storm.benchmark.component.bolt.UniqueVisitorBolt;
 import storm.benchmark.util.MockTupleHelpers;
 
 import java.util.Map;
@@ -15,8 +18,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-public class RollingCountBoltTest {
-
+public class RollingBoltTest {
   private static final String ANY_NON_SYSTEM_COMPONENT_ID = "irrelevant_component_id";
   private static final String ANY_NON_SYSTEM_STREAM_ID = "irrelevant_stream_id";
 
@@ -26,64 +28,52 @@ public class RollingCountBoltTest {
     return tuple;
   }
 
-  @SuppressWarnings("rawtypes")
-  @Test
-  public void shouldEmitNothingIfNoObjectHasBeenCountedYetAndTickTupleIsReceived() {
-    // given
+  @Test(dataProvider = "getRollingBolt")
+  public void shouldEmitNothingIfNoObjectHasBeenCountedYetAndTickTupleIsReceived(RollingBolt bolt) {
     Tuple tickTuple = MockTupleHelpers.mockTickTuple();
-    RollingCountBolt bolt = new RollingCountBolt();
     BasicOutputCollector collector = mock(BasicOutputCollector.class);
 
-    // when
     bolt.execute(tickTuple, collector);
 
-    // then
     verifyZeroInteractions(collector);
   }
 
-  @SuppressWarnings("rawtypes")
-  @Test
-  public void shouldEmitSomethingIfAtLeastOneObjectWasCountedAndTickTupleIsReceived() {
-    // given
+  @Test(dataProvider = "getRollingBolt")
+  public void shouldEmitSomethingIfAtLeastOneObjectWasCountedAndTickTupleIsReceived(RollingBolt bolt) {
     Tuple normalTuple = mockNormalTuple(new Object());
     Tuple tickTuple = MockTupleHelpers.mockTickTuple();
-
-    RollingCountBolt bolt = new RollingCountBolt();
     BasicOutputCollector collector = mock(BasicOutputCollector.class);
 
-    // when
     bolt.execute(normalTuple, collector);
     bolt.execute(tickTuple, collector);
 
-    // then
     verify(collector).emit(any(Values.class));
   }
 
-  @Test
-  public void shouldDeclareOutputFields() {
-    // given
+  @Test(dataProvider = "getRollingBolt")
+  public void shouldDeclareOutputFields(RollingBolt bolt) {
     OutputFieldsDeclarer declarer = mock(OutputFieldsDeclarer.class);
-    RollingCountBolt bolt = new RollingCountBolt();
 
-    // when
     bolt.declareOutputFields(declarer);
 
-    // then
     verify(declarer, times(1)).declare(any(Fields.class));
-
   }
 
-  @Test
-  public void shouldSetTickTupleFrequencyInComponentConfigurationToNonZeroValue() {
-    // given
-    RollingCountBolt bolt = new RollingCountBolt();
 
-    // when
+  @Test(dataProvider = "getRollingBolt")
+  public void shouldSetTickTupleFrequencyInComponentConfigurationToNonZeroValue(RollingBolt bolt) {
     Map<String, Object> componentConfig = bolt.getComponentConfiguration();
 
-    // then
     assertThat(componentConfig).containsKey(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS);
     Integer emitFrequencyInSeconds = (Integer) componentConfig.get(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS);
     assertThat(emitFrequencyInSeconds).isGreaterThan(0);
+  }
+
+  @DataProvider
+  private Object[][] getRollingBolt() {
+    return new Object[][] {
+            { new RollingCountBolt() },
+            { new UniqueVisitorBolt() }
+    };
   }
 }
