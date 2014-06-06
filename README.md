@@ -3,7 +3,7 @@
 Storm benchmark is a benchmark suite to measure the performanace of Storm-on-YARN. 
 
 
-## Wordloads
+## Workloads
 
 Currently, the benchmark consists 9 workloads. 
 
