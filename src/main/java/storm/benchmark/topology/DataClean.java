@@ -1,57 +1,50 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.spout.SchemeAsMultiScheme;
+import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import storm.benchmark.IBenchmark;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.bolt.FilterBolt;
-import storm.benchmark.bolt.PageViewBolt;
-import storm.benchmark.util.Util;
+import storm.benchmark.component.bolt.FilterBolt;
+import storm.benchmark.component.bolt.PageViewBolt;
+import storm.benchmark.util.BenchmarkUtils;
+import storm.benchmark.util.KafkaUtils;
 import storm.kafka.KafkaSpout;
-import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
 
-import java.util.Map;
-
-import static storm.benchmark.tools.PageView.Item;
+import static storm.benchmark.component.spout.pageview.PageView.Item;
 
 public class DataClean extends StormBenchmark {
-  private final static String SPOUT = "spout";
-  private final static String VIEW = "view";
-  private final static String FILTER = "filter";
-  private final static String EMIT_FREQ = "emit_frequency";
+  public final static String SPOUT_ID = "spout";
+  public final static String SPOUT_NUM = "topology.component.spout_num";
+  public final static String VIEW_ID = "view";
+  public final static String VIEW_NUM = "topology.component.view_bolt_num";
+  public final static String FILTER_ID = "filter";
+  public final static String FILTER_NUM = "topology.component.filter_bolt_num";
 
-  // number of Spouts to run in parallel
-  protected int spoutNum = 4;
-  // number of PageViewBolts to run in parallel
-  protected int pvBoltNum = 4;
-  // number of FilterBolts to run in parallel
-  protected int filtBoltNum = 4;
+  public static final int DEFAULT_SPOUT_NUM = 4;
+  public static final int DEFAULT_PV_BOLT_NUM = 4;
+  public static final int DEFAULT_FITLER_BOLT_NUM = 4;
 
-  protected int emitFreq = 60; // 60s
+  private IRichSpout spout;
 
-  protected SpoutConfig spoutConfig;
 
   @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
+  public StormTopology getTopology(Config config) {
+    final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int pvBoltNum = BenchmarkUtils.getInt(config, VIEW_NUM, DEFAULT_PV_BOLT_NUM);
+    final int filterBoltNum = BenchmarkUtils.getInt(config, FILTER_NUM, DEFAULT_FITLER_BOLT_NUM);
+    spout = new KafkaSpout(KafkaUtils.getSpoutConfig(
+            config, new SchemeAsMultiScheme(new StringScheme())));
 
-    spoutNum = Util.retIfPositive(spoutNum, (Integer) options.get(SPOUT));
-    pvBoltNum = Util.retIfPositive(pvBoltNum, (Integer) options.get(VIEW));
-    filtBoltNum = Util.retIfPositive(filtBoltNum, (Integer) options.get(FILTER));
-    emitFreq = Util.retIfPositive(emitFreq, (Integer) options.get(EMIT_FREQ));
-    spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-    return this;
-  }
-
-  @Override
-  public IBenchmark buildTopology() {
     TopologyBuilder builder = new TopologyBuilder();
-    builder.setSpout(SPOUT, new KafkaSpout(spoutConfig), spoutNum);
-    builder.setBolt(VIEW, new PageViewBolt(Item.STATUS, Item.ALL), pvBoltNum).shuffleGrouping(SPOUT);
-    builder.setBolt(FILTER, new FilterBolt<Integer>(404), filtBoltNum).fieldsGrouping(VIEW, new Fields(Item.STATUS.toString()));
-    topology = builder.createTopology();
-    return this;
+    builder.setSpout(SPOUT_ID, spout, spoutNum);
+    builder.setBolt(VIEW_ID, new PageViewBolt(Item.STATUS, Item.ALL), pvBoltNum)
+            .localOrShuffleGrouping(SPOUT_ID);
+    builder.setBolt(FILTER_ID, new FilterBolt<Integer>(404), filterBoltNum)
+            .fieldsGrouping(VIEW_ID, new Fields(Item.STATUS.toString()));
+    return builder.createTopology();
   }
 }

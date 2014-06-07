@@ -1,6 +1,8 @@
 package storm.benchmark;
 
-import java.util.Map;
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
+import storm.benchmark.metrics.IMetricsCollector;
 
 /**
  * Interface for all Benchmark topologies
@@ -8,13 +10,7 @@ import java.util.Map;
  * which would be serially carried out by BenchmarkRunner
  */
 public interface IBenchmark {
-  /**
-   *
-   * @param options from command line (set with "-c")
-   * @return
-   */
-  public IBenchmark parseOptions(Map options);
-  public IBenchmark buildTopology();
-  public IBenchmark submit() throws Exception;
-  public IBenchmark startMetrics();
+  public StormTopology getTopology(Config config);
+  public IMetricsCollector getMetricsCollector(Config config, StormTopology topology);
+  public void run() throws Exception;
 }

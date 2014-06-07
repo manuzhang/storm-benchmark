@@ -31,6 +31,10 @@
                    <groupId>ch.qos.logback</groupId>
                    <artifactId>logback-classic</artifactId>
                </exclusion>
+               <exclusion>
+                   <groupId>org.slf4j</groupId>
+                   <artifactId>log4j-over-slf4j</artifactId>
+               </exclusion>
             </exclusions>
             <scope>provided</scope>
         </dependency>
@@ -38,13 +42,23 @@
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-kafka</artifactId>
             <version>${storm.version}</version>
-          <!--  <classifier>scala_2.9.2</classifier> -->
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
             </exclusions>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.6.6</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>

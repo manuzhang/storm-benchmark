@@ -6,10 +6,11 @@ import org.testng.annotations.Test;
 
 import static org.junit.Assert.assertTrue;
 
+
 public class BenchmarkRunnerTest {
 
   @Test(dataProvider = "getValidNames")
-  public void returnBenchmarkFromValidName(String validName) throws Exception {
+  public void getBenchmarkFromValidName(String validName) throws Exception {
     assertTrue(BenchmarkRunner.getBenchmarkFrom(validName) instanceof IBenchmark);
   }
 
@@ -25,15 +26,15 @@ public class BenchmarkRunnerTest {
             {"FileReadWordCount"}, {"storm.benchmark.topology.FileReadWordCount"},
             {"SOL"}, {"storm.benchmark.topology.SOL"},
             {"Grep"}, {"storm.benchmark.topology.Grep"},
-            {"KafkaPageView"}, {"storm.benchmark.topology.KafkaPageView"},
-            {"KafkaUniqueVisitor"}, {"storm.benchmark.topology.KafkaUniqueVisitor"},
+            {"PageViewCount"}, {"storm.benchmark.topology.PageViewCount"},
+            {"UniqueVisitor"}, {"storm.benchmark.topology.UniqueVisitor"},
             {"KafkaWordCount"}, {"storm.benchmark.topology.KafkaWordCount"},
             {"DRPC"}, {"storm.benchmark.topology.DRPC"},
-            {"RollingSort"}, {"storm.benchmark.topology.RollingSort"},
+            {"RollingCount"}, {"storm.benchmark.topology.RollingCount"},
             {"SOL"}, {"storm.benchmark.topology.SOL"},
             {"TridentWordCount"}, {"storm.benchmark.topology.TridentWordCount"},
-            {"storm.benchmark.kafka.KafkaFileProducer"},
-            {"storm.benchmark.kafka.KafkaPageViewProducer"}
+            {"KafkaFileReadProducer"}, {"storm.benchmark.kafka.KafkaFileReadProducer"},
+            {"KafkaPageViewProducer"}, {"storm.benchmark.kafka.KafkaPageViewProducer"}
     };
   }
 

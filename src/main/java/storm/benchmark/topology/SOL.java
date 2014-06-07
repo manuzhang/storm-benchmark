@@ -1,59 +1,63 @@
 package storm.benchmark.topology;
 
+import backtype.storm.Config;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
-import storm.benchmark.BenchmarkConfig;
-import storm.benchmark.IBenchmark;
+import com.google.common.collect.Sets;
 import storm.benchmark.StormBenchmark;
-import storm.benchmark.bolt.ConstBolt;
-import storm.benchmark.metrics.BasicMetrics;
-import storm.benchmark.spout.RandomMessageSpout;
-import storm.benchmark.util.Util;
+import storm.benchmark.component.bolt.ConstBolt;
+import storm.benchmark.component.spout.RandomMessageSpout;
+import storm.benchmark.metrics.BasicMetricsCollector;
+import storm.benchmark.metrics.IMetricsCollector;
+import storm.benchmark.util.BenchmarkUtils;
 
-import java.util.Map;
+import static storm.benchmark.metrics.IMetricsCollector.MetricsItem;
 
-/*
+/**
  * forked from https://github.com/yahoo/storm-perf-test
  */
 
 public class SOL extends StormBenchmark {
 
-  private int msgSize = 100;
-  private int numLevels = 2;
-  private int spouts = 4;
-  private int bolts = 4;
-  private static final String TOPOLOGY_LEVEL = "topology.level";
+  public static final String TOPOLOGY_LEVEL = "topology.level";
+  public static final String SPOUT_ID = "spout";
+  public static final String SPOUT_NUM = "topology.component.spout_num";
+  public static final String BOLT_ID = "bolt";
+  public static final String BOLT_NUM = "topology.component.bolt_num";
 
-  private static final String SPOUT = "spout";
-  private static final String BOLT = "bolt";
-
-  @Override
-  public IBenchmark parseOptions(Map options) {
-    super.parseOptions(options);
-
-    numLevels = Util.retIfPositive(numLevels, (Integer) options.get(TOPOLOGY_LEVEL));
-    msgSize = Util.retIfPositive(msgSize, (Integer) options.get(BenchmarkConfig.MESSAGE_SIZE));
-    spouts = Util.retIfPositive(spouts, (Integer) options.get(SPOUT));
-    bolts = Util.retIfPositive(bolts, (Integer) options.get(BOLT));
-
-    metrics = new BasicMetrics();
-
-    return this;
-  }
+  public static final int DEFAULT_NUM_LEVELS = 2;
+  public static final int DEFAULT_SPOUT_NUM = 4;
+  public static final int DEFAULT_BOLT_NUM = 4;
+  private IRichSpout spout;
 
   @Override
-  public IBenchmark buildTopology() {
+  public StormTopology getTopology(Config config) {
+    final int numLevels = BenchmarkUtils.getInt(config, TOPOLOGY_LEVEL, DEFAULT_NUM_LEVELS);
+    final int msgSize = BenchmarkUtils.getInt(config, RandomMessageSpout.MESSAGE_SIZE,
+            RandomMessageSpout.DEFAULT_MESSAGE_SIZE);
+    final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
+    final int boltNum = BenchmarkUtils.getInt(config, BOLT_NUM, DEFAULT_BOLT_NUM);
+
+    spout = new RandomMessageSpout(msgSize, ifAckEnabled(config));
+
     TopologyBuilder builder = new TopologyBuilder();
 
-    builder.setSpout(SPOUT, new RandomMessageSpout(msgSize, config.ifAckEnabled()), spouts);
-    builder.setBolt(BOLT + 1, new ConstBolt(), bolts)
-      .shuffleGrouping(SPOUT);
+    builder.setSpout(SPOUT_ID, spout, spoutNum);
+    builder.setBolt(BOLT_ID + 1, new ConstBolt(), boltNum)
+      .localOrShuffleGrouping(SPOUT_ID);
     for (int levelNum = 2; levelNum <= numLevels - 1; levelNum++) {
-      builder.setBolt(BOLT + levelNum, new ConstBolt(), bolts)
-        .shuffleGrouping(BOLT + (levelNum - 1));
+      builder.setBolt(BOLT_ID + levelNum, new ConstBolt(), boltNum)
+        .localOrShuffleGrouping(BOLT_ID + (levelNum - 1));
     }
-    topology = builder.createTopology();
-
-    return this;
+   return builder.createTopology();
   }
+
+  @Override
+  public IMetricsCollector getMetricsCollector(Config config, StormTopology topology) {
+    return new BasicMetricsCollector(config, topology,
+            Sets.newHashSet(MetricsItem.ALL));
+  }
+
 }
 

@@ -1,7 +1,7 @@
 package storm.benchmark.kafka;
 
 import storm.benchmark.kafka.common.KafkaProducerSpout;
-import storm.benchmark.tools.FileReader;
+import storm.benchmark.util.FileReader;
 
 public class KafkaFileReadSpout extends KafkaProducerSpout {
 
@@ -10,6 +10,10 @@ public class KafkaFileReadSpout extends KafkaProducerSpout {
 
   public KafkaFileReadSpout(String file) {
     this.reader = new FileReader(file);
+  }
+
+  public KafkaFileReadSpout(FileReader reader) {
+    this.reader = reader;
   }
 
   @Override
