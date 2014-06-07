@@ -16,6 +16,7 @@ for benchmark in `cat $DIR/conf/benchmarks.lst`; do
       echo "ERROR: Storm job failed to run successfully." 
       exit $result
     fi
+    sleep 30s
   fi
 done
 
