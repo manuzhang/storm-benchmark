@@ -19,18 +19,19 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.List;
 
-public class DRPCMetricsCollector extends BasicMetricsCollector {
+public class DRPCMetricsCollector implements IMetricsCollector {
   private static final Logger LOG = Logger.getLogger(DRPCMetricsCollector.class);
 
-  private final String function;
-  private final List<String> args;
-  private final String server;
-  private final int port;
+  final MetricsCollectorConfig config;
+  final String function;
+  final List<String> args;
+  final String server;
+  final int port;
   int index = 0;
 
-  public DRPCMetricsCollector(Config config, StormTopology topology,
+  public DRPCMetricsCollector(Config stormConfig,
                               String function, List<String> args, String server, int port) {
-    super(config, topology, new HashSet<MetricsItem>());
+    this.config = new MetricsCollectorConfig(stormConfig);
     this.function = function;
     this.args = args;
     this.server = server;
@@ -41,17 +42,21 @@ public class DRPCMetricsCollector extends BasicMetricsCollector {
   public void run() {
     long now = System.currentTimeMillis();
 
-    final long endTime = now + totalTime;
+    final long endTime = now + config.totalTime;
     long totalLat = 0L;
     int count = 0;
     try {
-      final String confFile = String.format(METRICS_CONF_FORMAT, path, topoName, now);
-      final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
+      final String name = config.name;
+      final String path = config.path;
+      final String confFile = String.format(
+              MetricsCollectorConfig.CONF_FILE_FORMAT, path, name, now);
+      final String dataFile = String.format(
+              MetricsCollectorConfig.DATA_FILE_FORMAT, path, name, now);
       PrintWriter confWriter = FileUtils.createFileWriter(path, confFile);
       PrintWriter dataWriter = FileUtils.createFileWriter(path, dataFile);
-      writeStormConfig(confWriter);
+      config.writeStormConfig(confWriter);
       while (now < endTime) {
-        Thread.sleep(pollInterval);
+        Thread.sleep(config.pollInterval);
         long lat = execute(nextArg(), dataWriter);
         totalLat += lat;
         count++;

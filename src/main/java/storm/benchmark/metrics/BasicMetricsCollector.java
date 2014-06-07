@@ -45,31 +45,11 @@ public class BasicMetricsCollector implements IMetricsCollector {
   public static final String LAST_THREE_HOURS = "10800";
   public static final String LAST_DAY = "86400";
 
-  public static final String METRICS_CONF_FORMAT = "%s/%s_metrics_%d.yaml";
-  public static final String METRICS_FILE_FORMAT = "%s/%s_metrics_%d.csv";
-
-  public static final String METRICS_POLL_INTERVAL = "metrics.poll";
-  public static final String METRICS_TOTAL_TIME = "metrics.time";
-  public static final String METRICS_PATH = "metrics.path";
-
-  public static final int DEFAULT_POLL_INTERVAL = 30 * 1000; // 30 secs
-  public static final int DEFAULT_TOTAL_TIME = 5 * 60 * 1000; // 5 mins
-  public static final String DEFAULT_PATH = "/root/";
-
-  // How often should metrics be collected
-  int pollInterval;
-  // How long should the benchmark run for
-  int totalTime;
-  // message size
-  int msgSize;
-  // metrics file path
-  String path;
-
-  Config config;
-  StormTopology topology;
-  String topoName;
-  Set<String> header = new LinkedHashSet<String>();
-  Map<String, String> metrics = new HashMap<String, String>();
+  final MetricsCollectorConfig config;
+  final StormTopology topology;
+  final Set<String> header = new LinkedHashSet<String>();
+  final Map<String, String> metrics = new HashMap<String, String>();
+  final int msgSize;
   final boolean collectSupervisorStats;
   final boolean collectTopologyStats;
   final boolean collectExecutorStats;
@@ -78,13 +58,9 @@ public class BasicMetricsCollector implements IMetricsCollector {
   final boolean collectSpoutThroughput;
   final boolean collectSpoutLatency;
 
-  public BasicMetricsCollector(Config config, StormTopology topology, Set<MetricsItem> items) {
-    this.config = config;
+  public BasicMetricsCollector(Config stormConfig, StormTopology topology, Set<MetricsItem> items) {
+    this.config = new MetricsCollectorConfig(stormConfig);
     this.topology = topology;
-    topoName = (String) Utils.get(config, Config.TOPOLOGY_NAME, StormBenchmark.DEFAULT_TOPOLOGY_NAME);
-    pollInterval = BenchmarkUtils.getInt(config, METRICS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL);
-    totalTime = BenchmarkUtils.getInt(config, METRICS_TOTAL_TIME, DEFAULT_TOTAL_TIME);
-    path = (String) Utils.get(config, METRICS_PATH, DEFAULT_PATH);
     collectSupervisorStats = collectSupervisorStats(items);
     collectTopologyStats = collectTopologyStats(items);
     collectExecutorStats = collectExecutorStats(items);
@@ -92,32 +68,36 @@ public class BasicMetricsCollector implements IMetricsCollector {
     collectThroughputMB = collectThroughputMB(items);
     collectSpoutThroughput = collectSpoutThroughput(items);
     collectSpoutLatency = collectSpoutLatency(items);
-    if (collectThroughputMB) {
-      msgSize = BenchmarkUtils.getInt(config, RandomMessageSpout.MESSAGE_SIZE, RandomMessageSpout.DEFAULT_MESSAGE_SIZE);
-    }
+    msgSize = collectThroughputMB ?
+            BenchmarkUtils.getInt(stormConfig, RandomMessageSpout.MESSAGE_SIZE,
+                    RandomMessageSpout.DEFAULT_MESSAGE_SIZE) : 0;
   }
 
   @Override
   public void run() {
     long now = System.currentTimeMillis();
-    long endTime = now + totalTime;
+    long endTime = now + config.totalTime;
     MetricsState state = new MetricsState();
     state.startTime = now;
     state.lastTime = now;
 
-    final String confFile = String.format(METRICS_CONF_FORMAT, path, topoName, now);
-    final String dataFile = String.format(METRICS_FILE_FORMAT, path, topoName, now);
+    final String path = config.path;
+    final String name = config.name;
+    final String confFile = String.format(
+            MetricsCollectorConfig.CONF_FILE_FORMAT, path, name, now);
+    final String dataFile = String.format(
+            MetricsCollectorConfig.DATA_FILE_FORMAT, path, name, now);
     PrintWriter confWriter = FileUtils.createFileWriter(path, confFile);
     PrintWriter dataWriter = FileUtils.createFileWriter(path, dataFile);
-    writeStormConfig(confWriter);
+    config.writeStormConfig(confWriter);
     writeHeader(dataWriter);
 
     try {
       boolean live = true;
       do {
-        Utils.sleep(pollInterval);
+        Utils.sleep(config.pollInterval);
         now = System.currentTimeMillis();
-        live = pollNimbus(getNimbusClient(), now, state, dataWriter);
+        live = pollNimbus(getNimbusClient(config.stormConfig), now, state, dataWriter);
       } while (live && now < endTime);
     } catch (Exception e) {
       LOG.error("storm metrics failed! ", e);
@@ -127,21 +107,10 @@ public class BasicMetricsCollector implements IMetricsCollector {
     }
   }
 
-  public Nimbus.Client getNimbusClient() {
-    return NimbusClient.getConfiguredClient(config).getClient();
+  public Nimbus.Client getNimbusClient(Config stormConfig) {
+    return NimbusClient.getConfiguredClient(stormConfig).getClient();
   }
 
-  public void writeStormConfig(PrintWriter writer) {
-    LOG.info("writing out storm config into .yaml file");
-    if (writer != null) {
-      Map sorted = new TreeMap();
-      sorted.putAll(config);
-      for (Object key : sorted.keySet()) {
-        writer.println(key + ": " + config.get(key));
-      }
-      writer.flush();
-    }
-  }
 
   boolean pollNimbus(Nimbus.Client client, long now, MetricsState state, PrintWriter writer)
           throws Exception {
@@ -155,9 +124,10 @@ public class BasicMetricsCollector implements IMetricsCollector {
       updateSupervisorStats(cs);
     }
 
-    TopologySummary ts = MetricsUtils.getTopologySummary(cs, topoName);
+    final String name = config.name;
+    TopologySummary ts = MetricsUtils.getTopologySummary(cs, name);
     if (null == ts) {
-      LOG.error("TopologySummary not found for " + topoName);
+      LOG.error("TopologySummary not found for " + name);
       return false;
     }
 

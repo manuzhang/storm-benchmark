@@ -36,7 +36,7 @@ public class RollingCount extends StormBenchmark {
     final int emitFreq = BenchmarkUtils.getInt(config, EMIT_FREQ,
             RollingBolt.DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
 
-    spout = new FileReadSpout();
+    spout = new FileReadSpout(true);
 
     TopologyBuilder builder = new TopologyBuilder();
 

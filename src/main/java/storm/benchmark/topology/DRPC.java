@@ -6,6 +6,7 @@ import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import storm.benchmark.StormBenchmark;
 import storm.benchmark.metrics.DRPCMetricsCollector;
@@ -75,12 +76,16 @@ public class DRPC extends StormBenchmark {
       throw new IllegalArgumentException("must set a drpc server");
     }
     server = (String) sObj;
+    config.put(Config.DRPC_SERVERS, Lists.newArrayList(server));
 
     Object pObj = config.get(PORT);
     if (null == pObj) {
       throw new IllegalArgumentException("must set a drpc port");
     }
     port = Utils.getInt(pObj);
+    config.put(Config.DRPC_PORT, port);
+
+    LOG.info("drpc server: " + server + "; drpc port: " + port);
 
     final int spoutNum = BenchmarkUtils.getInt(config, SPOUT_NUM, DEFAULT_SPOUT_NUM);
     final int pageNum = BenchmarkUtils.getInt(config, PAGE_NUM, DEFAULT_PAGE_BOLT_NUM);
@@ -139,7 +144,7 @@ public class DRPC extends StormBenchmark {
 
   @Override
   public IMetricsCollector getMetricsCollector(Config config, StormTopology topology) {
-    return new DRPCMetricsCollector(config, topology, FUNCTION, ARGS, server, port);
+    return new DRPCMetricsCollector(config, FUNCTION, ARGS, server, port);
   }
 
   public static class StaticSingleKeyMapState extends ReadOnlyState implements ReadOnlyMapState<Object> {
