@@ -17,7 +17,7 @@ Currently, the benchmark consists 9 workloads.
 * dataclean
 * drpc
 
-They fall into two groups. The first group (wordcount, sol, rollingsort) are meant to measure Storm from resource utilization perspective and have no external dependencies. The second group (the rest) are more like real use cases and need Kafka as a source.
+They fall into two groups. The first group (wordcount, sol, rollingsort) are meant to measure Storm from resource utilization perspective and have no external dependencies. The second group (the rest) are of real use cases and need Kafka as a source.
 
 ## How to build 
 
@@ -46,7 +46,6 @@ They fall into two groups. The first group (wordcount, sol, rollingsort) are mea
   
   
   ```bash
-    APP_ID       # application id on YARN
     JAR          # Absolute path to the stom-benchmark-with-dependencies.jar
     MAIN_CLASS   # Please don't modify this
   ```
