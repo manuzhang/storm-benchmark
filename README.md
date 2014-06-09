@@ -1,6 +1,6 @@
 # Introduction
 
-Storm benchmark is a benchmark suite to measure the performanace of Storm-on-YARN. 
+Storm benchmark is a benchmark suite to measure the performanace of Storm. 
 
 
 ## Workloads
@@ -24,7 +24,7 @@ They fall into two groups. The first group (wordcount, sol, rollingsort) are mea
 1. get the source codes
 
   ```bash
-    git clone -b storm-intel https://github.com/manuzhang/storm-benchmark.git
+    git clone https://github.com/manuzhang/storm-benchmark.git
   ```
 
 2. build with maven
