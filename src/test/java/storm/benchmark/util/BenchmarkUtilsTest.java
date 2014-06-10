@@ -1,5 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
 package storm.benchmark.util;
 
+import backtype.storm.Config;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -59,4 +78,21 @@ public class BenchmarkUtilsTest {
     assertThat(BenchmarkUtils.getInt(map, "key2", 1)).isEqualTo(3);
   }
 
+  @Test(dataProvider = "getNumberOfAckers")
+  public void ifAckEnabledShouldReturnTrueForOneOrMoreAckers(int ackers, boolean expected) {
+    Config config = new Config();
+
+    assertThat(BenchmarkUtils.ifAckEnabled(config)).isFalse();
+    config.put(Config.TOPOLOGY_ACKER_EXECUTORS, ackers);
+    assertThat(BenchmarkUtils.ifAckEnabled(config)).isEqualTo(expected);
+  }
+
+  @DataProvider
+  private Object[][] getNumberOfAckers() {
+    return new Object[][] {
+            { 0, false },
+            { 1, true },
+            { 2, true }
+    };
+  }
 }
