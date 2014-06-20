@@ -34,11 +34,13 @@ public class RollingCountTest {
     StormBenchmark benchmark = new RollingCount();
     Config config = new Config();
     config.put(RollingCount.SPOUT_NUM, 4);
+    config.put(RollingCount.SPLIT_NUM, 5);
     config.put(RollingCount.COUNTER_NUM, 3);
 
     StormTopology topology = benchmark.getTopology(config);
     assertThat(topology).isNotNull();
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingCount.SPOUT_ID), 4);
+    TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingCount.SPLIT_ID), 5);
     TestUtils.verifyParallelism(Utils.getComponentCommon(topology, RollingCount.COUNTER_ID), 3);
   }
 }
