@@ -18,6 +18,7 @@
 
 package storm.benchmark.lib.bolt;
 
+import backtype.storm.Config;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 import storm.benchmark.lib.reducer.LongSummer;
 import storm.benchmark.tools.SlidingWindow;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -67,7 +69,7 @@ public class RollingCountBolt extends RollingBolt {
     for (Entry<Object, Long> entry : counts.entrySet()) {
       Object obj = entry.getKey();
       Long count = entry.getValue();
-      LOG.debug(String.format("get %d %s in last %d seconds", count, obj, windowLengthInSeconds));
+      LOG.info(String.format("get %d %s in last %d seconds", count, obj, windowLengthInSeconds));
       collector.emit(new Values(obj, count));
     }
   }
