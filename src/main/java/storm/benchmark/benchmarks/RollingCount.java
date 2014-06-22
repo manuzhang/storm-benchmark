@@ -36,11 +36,11 @@ public class RollingCount extends StormBenchmark {
   private static final String EMIT_FREQ = "emit.frequency";
 
   public static final String SPOUT_ID = "spout";
-  public static final String SPOUT_NUM = "benchmarks.component.spout_num";
+  public static final String SPOUT_NUM = "component.spout_num";
   public static final String SPLIT_ID = "split";
-  public static final String SPLIT_NUM = "benchmarks.component.split_bolt_num";
+  public static final String SPLIT_NUM = "component.split_bolt_num";
   public static final String COUNTER_ID = "rolling_count";
-  public static final String COUNTER_NUM = "benchmarks.component.rolling_count_bolt_num";
+  public static final String COUNTER_NUM = "component.rolling_count_bolt_num";
 
   public static final int DEFAULT_SPOUT_NUM = 4;
   public static final int DEFAULT_SP_BOLT_NUM = 8;

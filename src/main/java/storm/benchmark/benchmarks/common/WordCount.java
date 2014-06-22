@@ -40,11 +40,11 @@ public abstract class WordCount extends StormBenchmark {
   private static final Logger LOG = Logger.getLogger(WordCount.class);
 
   public static final String SPOUT_ID = "spout";
-  public static final String SPOUT_NUM = "benchmarks.component.spout_num";
+  public static final String SPOUT_NUM = "component.spout_num";
   public static final String SPLIT_ID = "split";
-  public static final String SPLIT_NUM = "benchmarks.component.split_bolt_num";
+  public static final String SPLIT_NUM = "component.split_bolt_num";
   public static final String COUNT_ID = "count";
-  public static final String COUNT_NUM = "benchmarks.component.count_bolt_num";
+  public static final String COUNT_NUM = "component.count_bolt_num";
   public static final int DEFAULT_SPOUT_NUM = 8;
   public static final int DEFAULT_SPLIT_BOLT_NUM = 4;
   public static final int DEFAULT_COUNT_BOLT_NUM = 4;

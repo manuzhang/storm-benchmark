@@ -31,7 +31,7 @@ PRODUCER_NAME=KafkaFileReadProducer
 TOPIC="fileread"
 CLIENT_ID="trident"
 
-COMPONENT=topology.component
+COMPONENT=component
 SPOUT_NUM=4
 SPLIT_NUM=8
 COUNT_NUM=12
@@ -41,5 +41,6 @@ KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.r
 
 echo "========== running TridentWordCount =========="
 run_producer
-run_benchmark
-kill_producer
+#run_benchmark
+run_topology
+#kill_producer

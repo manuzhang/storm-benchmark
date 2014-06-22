@@ -40,9 +40,9 @@ public class SOL extends StormBenchmark {
 
   public static final String TOPOLOGY_LEVEL = "benchmarks.level";
   public static final String SPOUT_ID = "spout";
-  public static final String SPOUT_NUM = "benchmarks.component.spout_num";
+  public static final String SPOUT_NUM = "component.spout_num";
   public static final String BOLT_ID = "bolt";
-  public static final String BOLT_NUM = "benchmarks.component.bolt_num";
+  public static final String BOLT_NUM = "component.bolt_num";
 
   public static final int DEFAULT_NUM_LEVELS = 2;
   public static final int DEFAULT_SPOUT_NUM = 4;

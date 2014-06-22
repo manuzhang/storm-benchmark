@@ -36,11 +36,11 @@ import static storm.benchmark.lib.spout.pageview.PageView.Item;
 
 public class DataClean extends StormBenchmark {
   public final static String SPOUT_ID = "spout";
-  public final static String SPOUT_NUM = "benchmarks.component.spout_num";
+  public final static String SPOUT_NUM = "component.spout_num";
   public final static String VIEW_ID = "view";
-  public final static String VIEW_NUM = "benchmarks.component.view_bolt_num";
+  public final static String VIEW_NUM = "component.view_bolt_num";
   public final static String FILTER_ID = "filter";
-  public final static String FILTER_NUM = "benchmarks.component.filter_bolt_num";
+  public final static String FILTER_NUM = "component.filter_bolt_num";
 
   public static final int DEFAULT_SPOUT_NUM = 4;
   public static final int DEFAULT_PV_BOLT_NUM = 4;

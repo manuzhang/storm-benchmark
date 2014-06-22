@@ -35,8 +35,8 @@ public abstract class RollingBolt extends BaseBasicBolt {
   public static final int DEFAULT_SLIDING_WINDOW_IN_SECONDS = DEFAULT_NUM_WINDOW_CHUNKS * 60;
   public static final int DEFAULT_EMIT_FREQUENCY_IN_SECONDS = DEFAULT_SLIDING_WINDOW_IN_SECONDS / DEFAULT_NUM_WINDOW_CHUNKS;
 
-  private final int windowLengthInSeconds;
-  private final int emitFrequencyInSeconds;
+  protected final int windowLengthInSeconds;
+  protected final int emitFrequencyInSeconds;
 
   public RollingBolt(int windowLengthInSeconds, int emitFrequencyInSeconds) {
     this.windowLengthInSeconds = windowLengthInSeconds;

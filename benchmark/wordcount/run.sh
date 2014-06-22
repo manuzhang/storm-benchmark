@@ -26,10 +26,13 @@ BASE_DIR=$CUR_DIR/..
 TOPOLOGY_CLASS=storm.benchmark.benchmarks.FileReadWordCount
 TOPOLOGY_NAME=WordCount
 
-COMPONENT=topology.component
-SPOUT_NUM=4
-SPLIT_NUM=8
-COUNT_NUM=8
+COMPONENT=component
+SPOUT_NUM=64
+SPLIT_NUM=64
+COUNT_NUM=64
+
+WORKERS=16
+ACKERS=16
 
 TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.split_bolt_num=$SPLIT_NUM,$COMPONENT.count_bolt_num=$COUNT_NUM
 

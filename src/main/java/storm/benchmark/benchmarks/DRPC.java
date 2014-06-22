@@ -67,13 +67,13 @@ public class DRPC extends StormBenchmark {
   public static final String SERVER = "drpc.server";
   public static final String PORT = "drpc.port";
   public static final String SPOUT_ID = "spout";
-  public static final String SPOUT_NUM = "benchmarks.component.spout_num";
+  public static final String SPOUT_NUM = "component.spout_num";
   public static final String PAGE_ID = "page";
-  public static final String PAGE_NUM = "benchmarks.component.page_bolt_num";
+  public static final String PAGE_NUM = "component.page_bolt_num";
   public static final String VIEW_ID = "view";
-  public static final String VIEW_NUM = "benchmarks.component.view_bolt_num";
-  public static final String USER_NUM = "benchmarks.component.user_bolt_num";
-  public static final String FOLLOWER_NUM = "benchmarks.component.follower_bolt_num";
+  public static final String VIEW_NUM = "component.view_bolt_num";
+  public static final String USER_NUM = "component.user_bolt_num";
+  public static final String FOLLOWER_NUM = "component.follower_bolt_num";
 
   public static final int DEFAULT_SPOUT_NUM = 4;
   public static final int DEFAULT_PAGE_BOLT_NUM = 8;

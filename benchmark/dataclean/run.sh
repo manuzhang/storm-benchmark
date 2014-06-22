@@ -31,7 +31,7 @@ PRODUCER_NAME=PageViewKafkaProducer
 TOPIC="pageview"
 CLIENT_ID="dataclean"
 
-COMPONENT=topology.component
+COMPONENT=component
 SPOUT_NUM=4
 VIEW_NUM=8
 FILTER_NUM=8

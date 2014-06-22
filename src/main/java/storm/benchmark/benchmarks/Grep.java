@@ -46,11 +46,11 @@ public class Grep extends StormBenchmark {
   private static final Logger LOG = Logger.getLogger(Grep.class);
 
   public static final String SPOUT_ID = "spout";
-  public static final String SPOUT_NUM = "benchmarks.component.spout_num";
+  public static final String SPOUT_NUM = "component.spout_num";
   public static final String FM_ID = "find";
-  public static final String FM_NUM = "benchmarks.component.find_bolt_num";
+  public static final String FM_NUM = "component.find_bolt_num";
   public static final String CM_ID = "count";
-  public static final String CM_NUM = "benchmarks.component.count_bolt_num";
+  public static final String CM_NUM = "component.count_bolt_num";
   public static final String PATTERN_STRING = "pattern_string";
 
   public static final String DEFAULT_PATTERN_STR = "string";

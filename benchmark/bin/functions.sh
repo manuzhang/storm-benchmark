@@ -35,6 +35,7 @@ run_topology() {
     CONFIG=$TOPOLOGY_CONF,$METRICS_CONF
   fi
   CONFIG=`echo $CONFIG | sed -r "s/,/ -c /g"`
+  echo $CONFIG
   $BIN jar $JAR $MAIN_CLASS $TOPOLOGY_CLASS -c $CONFIG
 }
 

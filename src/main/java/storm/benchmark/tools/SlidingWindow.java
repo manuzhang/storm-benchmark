@@ -25,7 +25,9 @@ import storm.benchmark.lib.reducer.Reducer;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class SlidingWindow<K, V> implements Serializable {
   private static final long serialVersionUID = -2645063988768785810L;
@@ -137,10 +139,14 @@ public class SlidingWindow<K, V> implements Serializable {
     }
 
     public void wipeZeros() {
+      Set<K> toBeRemoved = new HashSet<K>();
       for (K obj : objToValues.keySet()) {
         if (shouldBeRemoved(obj)) {
-          wipe(obj);
+          toBeRemoved.add(obj);
         }
+      }
+      for (K obj : toBeRemoved) {
+        wipe(obj);
       }
     }
 

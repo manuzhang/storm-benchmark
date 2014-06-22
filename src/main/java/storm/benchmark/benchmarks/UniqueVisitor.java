@@ -36,11 +36,11 @@ import static storm.benchmark.lib.spout.pageview.PageView.Item;
 
 public class UniqueVisitor extends StormBenchmark {
   public final static String SPOUT_ID = "spout";
-  public final static String SPOUT_NUM = "benchmarks.component.spout_num";
+  public final static String SPOUT_NUM = "component.spout_num";
   public final static String VIEW_ID = "view";
-  public final static String VIEW_NUM = "benchmarks.component.view_bolt_num";
+  public final static String VIEW_NUM = "component.view_bolt_num";
   public final static String UNIQUER_ID = "uniquer";
-  public final static String UNIQUER_NUM = "benchmarks.component.uniquer_bolt_num";
+  public final static String UNIQUER_NUM = "component.uniquer_bolt_num";
   public final static String WINDOW_LENGTH = "window.length";
   public final static String EMIT_FREQ = "emit.frequency";
 

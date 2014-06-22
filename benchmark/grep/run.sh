@@ -31,7 +31,7 @@ PRODUCER_NAME=FileReadKafkaProducer
 TOPIC="fileread"
 CLIENT_ID="grep"
 
-COMPONENT=topology.component
+COMPONENT=component
 SPOUT_NUM=4
 FIND_NUM=8
 COUNT_NUM=8

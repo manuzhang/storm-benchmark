@@ -31,7 +31,7 @@ PRODUCER_NAME=PageViewKafkaProducer
 TOPIC="pageview"
 CLIENT_ID="unique_visitor"
 
-COMPONENT=topology.component
+COMPONENT=component
 SPOUT_NUM=4
 VIEW_NUM=8
 UNIQUER_NUM=8
