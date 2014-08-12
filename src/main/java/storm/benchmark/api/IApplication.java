@@ -21,6 +21,11 @@ package storm.benchmark.api;
 import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
 
+/**
+ * superclass of any runnable storm applications
+ * users should not implement this interface directly but
+ * {@link IBenchmark} or {@link IProducer}
+ */
 public interface IApplication {
   public StormTopology getTopology(Config config);
 }

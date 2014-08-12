@@ -23,9 +23,10 @@ import backtype.storm.generated.StormTopology;
 import storm.benchmark.metrics.IMetricsCollector;
 
 /**
- * Interface for all Benchmark topologies
- * A benchmark class should implement the following methods
- * which would be serially carried out by Runner
+ * users could write their own benchmarks against this interface.
+ * a benchmark is a storm application augmented with a
+ * {@link storm.benchmark.metrics.IMetricsCollector}, which collects
+ * metrics like throughout or latency
  */
 public interface IBenchmark extends IApplication {
   public IMetricsCollector getMetricsCollector(Config config, StormTopology topology);

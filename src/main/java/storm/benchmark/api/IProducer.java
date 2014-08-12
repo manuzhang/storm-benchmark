@@ -18,5 +18,11 @@
 
 package storm.benchmark.api;
 
+/**
+ * benchmarks get data from a producer, which is
+ * also a storm application. Refer to
+ * {@link storm.benchmark.tools.producer.kafka.KafkaProducer}
+ * for an example
+ */
 public interface IProducer extends IApplication {
 }
