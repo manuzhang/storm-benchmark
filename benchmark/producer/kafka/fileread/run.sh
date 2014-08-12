@@ -28,11 +28,10 @@ TOPOLOGY_NAME=FileReadKafkaProducer
 
 TOPIC="fileread"
 
-COMPONENT=producer
 SPOUT_NUM=4
 BOLT_NUM=4
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.bolt_num=$BOLT_NUM
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,producer.spout_num=$SPOUT_NUM,producer.bolt_num=$BOLT_NUM
 KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.root.path=$KAFKA_ROOT_PATH,topic=$TOPIC
 
 echo "========== running KafkaFileReadProducer =========="

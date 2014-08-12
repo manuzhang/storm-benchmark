@@ -18,28 +18,28 @@
 
 CUR_DIR=`dirname "$0"`
 BASE_DIR=$CUR_DIR/..
-PRODUCER_DIR=$BASE_DIR/producer/kafka/pageview
 . $BASE_DIR/conf/config.sh
 . $BASE_DIR/bin/functions.sh
 
 # benchmarks configurations
 
-TOPOLOGY_CLASS=storm.benchmark.benchmarks.DataClean
-TOPOLOGY_NAME=DataClean
+TOPOLOGY_CLASS=storm.benchmark.benchmarks.RollingSort
+TOPOLOGY_NAME=RollingSort
 
-PRODUCER_NAME=PageViewKafkaProducer
-TOPIC="pageview"
-CLIENT_ID="dataclean"
+COMPONENT=component
+SPOUT_NUM=64
+SORT_NUM=64
 
-SPOUT_NUM=4
-VIEW_NUM=8
-FILTER_NUM=8
+EMIT_FREQ=300 # 5mins
+CHUNK_SIZE=2000000 # 2M
+MESSAGE_SIZE=10000 # 10KB
 
+WORKERS=16
+ACKERS=16
+PENDING=200
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,component.spout_num=$SPOUT_NUM,component.view_bolt_num=$VIEW_NUM,component.filter_bolt_num=$FILTER_NUM
-KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.root.path=$KAFKA_ROOT_PATH,topic=$TOPIC,client_id=$CLIENT_ID
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.sort_bolt_num=$SORT_NUM,emit.frequency=$EMIT_FREQ,chunk.size=$CHUNK_SIZE,message.size=$MESSAGE_SIZE,topology.worker.childopts=-Xmx16384m
 
-echo "========== running DataClean =========="
-run_producer
+echo "========== running RollingSort =========="
 run_benchmark
-kill_producer
+

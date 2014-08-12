@@ -26,7 +26,6 @@ BASE_DIR=$CUR_DIR/..
 TOPOLOGY_CLASS=storm.benchmark.benchmarks.RollingCount
 TOPOLOGY_NAME=RollingCount
 
-COMPONENT=component
 SPOUT_NUM=64
 SPLIT_NUM=64
 COUNT_NUM=128
@@ -34,7 +33,7 @@ COUNT_NUM=128
 WINDOW_LEN=150
 EMIT_FREQ=30
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.split_bolt_num=$SPLIT_NUM,$COMPONENT.rolling_count_bolt_num=$COUNT_NUM,window.length=$WINDOW_LEN,emit.frequency=$EMIT_FREQ
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,component.spout_num=$SPOUT_NUM,component.split_bolt_num=$SPLIT_NUM,component.rolling_count_bolt_num=$COUNT_NUM,window.length=$WINDOW_LEN,emit.frequency=$EMIT_FREQ
 
 echo "========== running RollingCount =========="
 run_benchmark

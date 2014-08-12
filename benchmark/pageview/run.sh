@@ -31,13 +31,12 @@ PRODUCER_NAME=PageViewKafkaProducer
 TOPIC="pageview"
 CLIENT_ID="pageview_count"
 
-COMPONENT=component
 SPOUT_NUM=4
 VIEW_NUM=8
 COUNT_NUM=8
 
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.view_bolt_num=$VIEW_NUM,$COMPONENT.count_bolt_num=$COUNT_NUM
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,component.spout_num=$SPOUT_NUM,component.view_bolt_num=$VIEW_NUM,component.count_bolt_num=$COUNT_NUM
 KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.root.path=$KAFKA_ROOT_PATH,topic=$TOPIC,client_id=$CLIENT_ID
 
 echo "========== running PageViewCount =========="

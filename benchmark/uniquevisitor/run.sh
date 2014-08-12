@@ -31,7 +31,6 @@ PRODUCER_NAME=PageViewKafkaProducer
 TOPIC="pageview"
 CLIENT_ID="unique_visitor"
 
-COMPONENT=component
 SPOUT_NUM=4
 VIEW_NUM=8
 UNIQUER_NUM=8
@@ -40,7 +39,7 @@ WINDOW_LENGTH=300 # 5 mins
 EMIT_FREQ=60      # 60 secs
 
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.view_bolt_num=$VIEW_NUM,$COMPONENT.uniquer_bolt_num=$UNIQUER_NUM,window.length=$WINDOW_LENGTH,emit.frequency=$EMIT_FREQ
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,component.spout_num=$SPOUT_NUM,component.view_bolt_num=$VIEW_NUM,component.uniquer_bolt_num=$UNIQUER_NUM,window.length=$WINDOW_LENGTH,emit.frequency=$EMIT_FREQ
 KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.root.path=$KAFKA_ROOT_PATH,topic=$TOPIC,client_id=$CLIENT_ID
 
 echo "========== running UniqueVisitor =========="

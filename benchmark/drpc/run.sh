@@ -31,7 +31,6 @@ PRODUCER_NAME=PageViewKafkaProducer
 TOPIC="pageview"
 CLIENT_ID="drpc"
 
-COMPONENT=component
 SPOUT_NUM=3
 PAGE_NUM=6
 VIEW_NUM=9
@@ -41,7 +40,7 @@ FOLLOWER_NUM=8
 DRPC_SERVER=intelidh-01
 DRPC_PORT=3772
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,drpc.server=$DRPC_SERVER,drpc.port=$DRPC_PORT,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.page_bolt_num=$PAGE_NUM,$COMPONENT.view_bolt_num=$VIEW_NUM,$component.user_bolt_num=$USER_NUM,$component.follower_bolt_num=$FOLLOWER_NUM
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,drpc.server=$DRPC_SERVER,drpc.port=$DRPC_PORT,component.spout_num=$SPOUT_NUM,component.page_bolt_num=$PAGE_NUM,component.view_bolt_num=$VIEW_NUM,$component.user_bolt_num=$USER_NUM,$component.follower_bolt_num=$FOLLOWER_NUM
 KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.root.path=$KAFKA_ROOT_PATH,topic=$TOPIC,client_id=$CLIENT_ID
 echo $KAFKA_CONF
 

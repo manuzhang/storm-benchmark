@@ -26,7 +26,6 @@ BASE_DIR=$CUR_DIR/..
 TOPOLOGY_CLASS=storm.benchmark.benchmarks.FileReadWordCount
 TOPOLOGY_NAME=WordCount
 
-COMPONENT=component
 SPOUT_NUM=64
 SPLIT_NUM=64
 COUNT_NUM=64
@@ -34,7 +33,7 @@ COUNT_NUM=64
 WORKERS=16
 ACKERS=16
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.split_bolt_num=$SPLIT_NUM,$COMPONENT.count_bolt_num=$COUNT_NUM
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,component.spout_num=$SPOUT_NUM,component.split_bolt_num=$SPLIT_NUM,component.count_bolt_num=$COUNT_NUM
 
 
 echo "========== running WordCount =========="

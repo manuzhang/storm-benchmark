@@ -31,14 +31,13 @@ PRODUCER_NAME=FileReadKafkaProducer
 TOPIC="fileread"
 CLIENT_ID="grep"
 
-COMPONENT=component
 SPOUT_NUM=4
 FIND_NUM=8
 COUNT_NUM=8
 
 PATTERN_STRING="string"
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,$COMPONENT.spout_num=$SPOUT_NUM,$COMPONENT.find_bolt_num=$FIND_NUM,$COMPONENT.count_bolt_num=$COUNT_NUM,pattern_string=$PATTERN_STRING
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,component.spout_num=$SPOUT_NUM,component.find_bolt_num=$FIND_NUM,component.count_bolt_num=$COUNT_NUM,pattern_string=$PATTERN_STRING
 KAFKA_CONF=broker.list=$BROKER_LIST,zookeeper.servers=$ZOOKEEPER_SERVERS,kafka.root.path=$KAFKA_ROOT_PATH,topic=$TOPIC,client_id=$CLIENT_ID
 
 echo "========== running Grep =========="
