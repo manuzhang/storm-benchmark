@@ -34,6 +34,7 @@ import storm.benchmark.lib.spout.RandomMessageSpout;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.TupleHelpers;
 
+import java.io.Serializable;
 import java.util.*;
 
 public class RollingSort extends StormBenchmark {
@@ -55,12 +56,14 @@ public class RollingSort extends StormBenchmark {
     final int boltNum =  BenchmarkUtils.getInt(config, SORT_BOLT_NUM, DEFAULT_SORT_BOLT_NUM);
     final int msgSize = BenchmarkUtils.getInt(config, RandomMessageSpout.MESSAGE_SIZE,
             RandomMessageSpout.DEFAULT_MESSAGE_SIZE);
+    final int chunkSize = BenchmarkUtils.getInt(config, SortBolt.CHUNK_SIZE,
+            SortBolt.DEFAULT_CHUNK_SIZE);
     final int emitFreq = BenchmarkUtils.getInt(config, SortBolt.EMIT_FREQ,
             SortBolt.DEFAULT_EMIT_FREQ);
     spout = new RandomMessageSpout(msgSize, BenchmarkUtils.ifAckEnabled(config));
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT_ID, spout, spoutNum);
-    builder.setBolt(SORT_BOLT_ID, new SortBolt(emitFreq), boltNum)
+    builder.setBolt(SORT_BOLT_ID, new SortBolt(emitFreq, chunkSize), boltNum)
             .localOrShuffleGrouping(SPOUT_ID);
     return builder.createTopology();
   }
@@ -69,29 +72,38 @@ public class RollingSort extends StormBenchmark {
 
     public static final String EMIT_FREQ = "emit.frequency";
     public static final int DEFAULT_EMIT_FREQ = 60;  // 60s
-
-    public static final String FIELDS = "sorted";
+    public static final String CHUNK_SIZE = "chunk.size";
+    public static final int DEFAULT_CHUNK_SIZE = 100;
+    public static final String FIELDS = "sorted_data";
 
     private int emitFrequencyInSeconds;
-    private List<Comparable> data = new ArrayList<Comparable>();
+    private int chunkSize;
+    private int index = 0;
+    private MutableComparable[] data;
 
 
-    public SortBolt(int emitFrequencyInSeconds) {
+    public SortBolt(int emitFrequencyInSeconds, int chunkSize) {
       this.emitFrequencyInSeconds = emitFrequencyInSeconds;
+      this.chunkSize = chunkSize;
+      this.data = new MutableComparable[this.chunkSize];
+      for (int i = 0; i < this.chunkSize; i++) {
+        this.data[i] = new MutableComparable();
+      }
     }
 
     @Override
     public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
       if (TupleHelpers.isTickTuple(tuple)) {
-        LOG.info("data size: " + data.size());
-        for (Comparable c : data) {
-          basicOutputCollector.emit(new Values(c));
-        }
-        data.clear();
+        basicOutputCollector.emit(new Values(data));
       } else {
-        data.add((Comparable) tuple.getValue(0));
-        Collections.sort(data);
-
+        Object obj = tuple.getValue(0);
+        if (obj instanceof Comparable) {
+          data[index].set((Comparable) obj);
+        } else {
+          throw new RuntimeException("tuple value is not a Comparable");
+        }
+        Arrays.sort(data, 0, index);
+        index = (index + 1 == chunkSize) ? 0 : index + 1;
       }
     }
 
@@ -105,6 +117,42 @@ public class RollingSort extends StormBenchmark {
       Map<String, Object> conf = new HashMap<String, Object>();
       conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, emitFrequencyInSeconds);
       return conf;
+    }
+  }
+
+  private static class MutableComparable implements Comparable, Serializable {
+    private static final long serialVersionUID = -5417151427431486637L;
+    private Comparable c = null;
+
+    public MutableComparable() {
+
+    }
+
+    public MutableComparable(Comparable c) {
+      this.c = c;
+    }
+
+    public void set(Comparable c) {
+      this.c = c;
+    }
+
+    public Comparable get() {
+      return c;
+    }
+
+    @Override
+    public int compareTo(Object other) {
+      if (other == null) return 1;
+      Comparable oc = ((MutableComparable) other).get();
+      if (null == c && null == oc) {
+        return 0;
+      } else if (null == c) {
+        return -1;
+      } else if (null == oc) {
+        return 1;
+      } else {
+        return c.compareTo(oc);
+      }
     }
   }
 }
