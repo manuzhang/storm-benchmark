@@ -20,6 +20,7 @@ package storm.benchmark.benchmarks;
 
 import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -76,8 +77,8 @@ public class RollingSort extends StormBenchmark {
     public static final int DEFAULT_CHUNK_SIZE = 100;
     public static final String FIELDS = "sorted_data";
 
-    private int emitFrequencyInSeconds;
-    private int chunkSize;
+    private final int emitFrequencyInSeconds;
+    private final int chunkSize;
     private int index = 0;
     private MutableComparable[] data;
 
@@ -85,6 +86,10 @@ public class RollingSort extends StormBenchmark {
     public SortBolt(int emitFrequencyInSeconds, int chunkSize) {
       this.emitFrequencyInSeconds = emitFrequencyInSeconds;
       this.chunkSize = chunkSize;
+    }
+
+    @Override
+    public void prepare(Map stormConf, TopologyContext context) {
       this.data = new MutableComparable[this.chunkSize];
       for (int i = 0; i < this.chunkSize; i++) {
         this.data[i] = new MutableComparable();
@@ -94,7 +99,9 @@ public class RollingSort extends StormBenchmark {
     @Override
     public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
       if (TupleHelpers.isTickTuple(tuple)) {
+        Arrays.sort(data);
         basicOutputCollector.emit(new Values(data));
+        LOG.info("index = " + index);
       } else {
         Object obj = tuple.getValue(0);
         if (obj instanceof Comparable) {
@@ -102,7 +109,6 @@ public class RollingSort extends StormBenchmark {
         } else {
           throw new RuntimeException("tuple value is not a Comparable");
         }
-        Arrays.sort(data, 0, index);
         index = (index + 1 == chunkSize) ? 0 : index + 1;
       }
     }
