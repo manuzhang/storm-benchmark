@@ -19,16 +19,22 @@
 package storm.benchmark.tools;
 
 import backtype.storm.Config;
+import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
+import org.apache.thrift7.TException;
+import org.apache.thrift7.protocol.TCompactProtocol;
+import org.apache.thrift7.transport.TIOStreamTransport;
 import storm.benchmark.api.IApplication;
 import storm.benchmark.api.IBenchmark;
 import storm.benchmark.api.IProducer;
 import storm.benchmark.metrics.IMetricsCollector;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Runner is the main class of storm benchmark
