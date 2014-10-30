@@ -5,19 +5,23 @@ Storm benchmark is a benchmark suite to measure the performanace of Storm.
 
 ## Workloads
 
-Currently, the benchmark consists 9 workloads. 
+Currently, the benchmark consists 9 workloads. It falls into two categories:
 
-* wordcount 
-* sol
-* rollingcount
-* trident
-* uniquevisitor 
-* pageview
-* grep
-* dataclean
-* drpc
+ - Simple resource benchmarks. The goal of this category is to measure how we behavior with the pressure of resource.
+    * wordcount, CPU sensitive
+    * sol, network sensitive
+    * rollingsort, memory sensitive
 
-They fall into two groups. The first group (wordcount, sol, rollingsort) are meant to measure Storm from resource utilization perspective and have no external dependencies. The second group (the rest) are of real use cases and need Kafka as a source.
+ - Real life use-case benchmark. The goal of this category is to measure how storm performs in real-life use cases. Incluing:
+     * rollingcount
+     * trident
+     * uniquevisitor 
+     * pageview
+     * grep
+     * dataclean
+     * drpc
+
+This category of benchmark will requires the Kafka been setup beforehand, as we will use that to simulate the data source.
 
 ## How to build 
 
