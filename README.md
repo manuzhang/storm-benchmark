@@ -91,19 +91,10 @@ KAFKA_ROOT_PATH=/kafka/kafka-cluster-0
 5. Check results.
  The benchmark results will be stored at config path METRICS_PATH(default is: /root/benchmark/reports). It contains througput data and latency of the whole cluster.
  
- The result contains two files:
-   1. the benchmark performance data file. For wordcount, it is named like `WordCount_metrics_1402148415021.csv`
-   2. The active config when running the benchmark. For wordcount, it is named like `WordCount_metrics_1402148415021.yaml`
+ The result of wordcount contains two files
 
-Here is a snippet of what `WordCount_metrics_1402148415021.csv` looks like:
-
-
-  ```
-  time(s),total_slots,used_slots,workers,tasks,executors,transferred (messages),throughput (messages/s),spout_executors,spout_transferred (messages),spout_acked (messages),spout_throughput (messages/s),spout_avg_complete_latency(ms),spout_max_complete_latency(ms)
-  60,16,4,4,24,24,37157180,619224,4,3807300,3806140,63448,11.5,11.7
-  120,16,4,4,24,24,40878860,679479,4,4184340,7992280,69551,11.2,11.3
-  ...
-  ```
+    1. `WordCount_metrics_1402148415021.csv`, performnace data.
+    2. `WordCount_metrics_1402148415021.yaml`. The config used to run this test.
 
 ## Supports
 
