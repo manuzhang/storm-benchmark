@@ -1,5 +1,3 @@
-Storm benchmark is a benchmark suite to measure the performanace of Storm. 
-
 ## How we measure storm performance
 
 The benchmark consists 9 workloads. It falls into two categories. The first category is "simple resource benchmark", the goal is to how storm performs under pressure of certain resource. The second category is to measure how storm performs in real-life typical use cases.
