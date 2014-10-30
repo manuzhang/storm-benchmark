@@ -1,18 +1,15 @@
-# Introduction
-
 Storm benchmark is a benchmark suite to measure the performanace of Storm. 
 
+## How we measure storm performance
 
-## Workloads
+The benchmark consists 9 workloads. It falls into two categories. The first category is "simple resource benchmark", the goal is to how storm performs under pressure of certain resource. The second category is to measure how storm performs in real-life typical use cases.
 
-Currently, the benchmark consists 9 workloads. It falls into two categories:
-
- - Simple resource benchmarks. The goal of this category is to measure how we behavior with the pressure of resource.
+ - Simple resource benchmarks:
     * wordcount, CPU sensitive
     * sol, network sensitive
     * rollingsort, memory sensitive
 
- - Real life use-case benchmark. The goal of this category is to measure how storm performs in real-life use cases. Incluing:
+ - Real life use-case benchmark:
      * rollingcount
      * trident
      * uniquevisitor 
@@ -21,28 +18,18 @@ Currently, the benchmark consists 9 workloads. It falls into two categories:
      * dataclean
      * drpc
 
-This category of benchmark will requires the Kafka been setup beforehand, as we will use that to simulate the data source.
+## How to use
 
-## How to build 
-
-1. get the source codes
-
+1. Setup. 
+   
+  First, build storm-benchmark.
   ```bash
     git clone https://github.com/manuzhang/storm-benchmark.git
+    mvn package
   ```
+ Then copy the **./benchmark** directory and **stom-benchmark-with-dependencies.jar** onto a storm client node.
 
-2. build with maven
-
-  ```bash
-    mvn install -DskipTests
-  ```
-
-## How to run
-
-1. Setup benchmark package. copy the **./benchmark** directory and **stom-benchmark-with-dependencies.jar** onto a storm client node.
-
-
-2. Modify benchmark config. modify `./benchmark/conf/config.sh`.
+2. Config. modify `./benchmark/conf/config.sh`.
 
   
   ```bash
@@ -83,9 +70,7 @@ ZOOKEEPER_SERVERS=intelidh-04:2181
 KAFKA_ROOT_PATH=/kafka/kafka-cluster-0  
 ```
 
-3. Choose benchmarks to run.
-
-  Customize `benchmark/conf/benchmark.lst`, for example, to run wordcount only
+3. Choose. Pick the benchmarks to run in `benchmark/conf/benchmark.lst`, for example, to run wordcount only
 
   ```bash
     wordcount
@@ -99,14 +84,13 @@ KAFKA_ROOT_PATH=/kafka/kafka-cluster-0
     #drpc
   ```
 
-
-4. run  
+4. Run.  
 
   ```bash 
     benchmark/bin/run-all.sh
   ```
 
-5. Check results
+5. Check results.
  The benchmark results will be stored at config path METRICS_PATH(default is: /root/benchmark/reports). It contains througput data and latency of the whole cluster.
  
  The result contains two files:
