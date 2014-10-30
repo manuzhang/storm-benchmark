@@ -123,7 +123,7 @@ Here is a snippet of what `WordCount_metrics_1402148415021.csv` looks like:
   ...
   ```
 
-## Support and Contact
+## Supports
 
 Please contact:
 Manu Zhang: tianlun.zhang@intel.com
