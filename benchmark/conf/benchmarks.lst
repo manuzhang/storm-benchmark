@@ -1,3 +1,4 @@
+## Comment out benchmarks with "#" if you don't want to run it.
 wordcount
 sol
 rollingcount
