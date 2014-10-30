@@ -100,8 +100,8 @@ KAFKA_ROOT_PATH=/kafka/kafka-cluster-0
 
 Please contact:
 
-  Manu Zhang: tianlun.zhang@intel.com
-  Sean Zhong: xiang.zhong@intel.com
+ - Manu Zhang: tianlun.zhang@intel.com
+ - Sean Zhong: xiang.zhong@intel.com
 
 ## Acknowledgement
 
