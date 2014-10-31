@@ -18,14 +18,13 @@ The benchmark consists 9 workloads. It falls into two categories. The first cate
 
 ## How to use
 
-1. Setup. 
+1. Build. 
    
   First, build storm-benchmark.
   ```bash
     git clone https://github.com/manuzhang/storm-benchmark.git
     mvn package
   ```
- Then copy the **./benchmark** directory and **stom-benchmark-with-dependencies.jar** onto a storm client node.
 
 2. Config. modify `./benchmark/conf/config.sh`.
 
