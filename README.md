@@ -1,13 +1,13 @@
-## How we measure storm performance
+## How do we measure storm performance
 
-The benchmark consists 9 workloads. It falls into two categories. The first category is "simple resource benchmark", the goal is to how storm performs under pressure of certain resource. The second category is to measure how storm performs in real-life typical use cases.
+The benchmark set contains 9 workloads. They fall into two categories. The first category is "simple resource benchmark", the goal is to test how storm performs under pressure of certain resource. The second category is to measure how storm performs in real-life typical use cases.
 
  - Simple resource benchmarks:
     * wordcount, CPU sensitive
     * sol, network sensitive
     * rollingsort, memory sensitive
 
- - Real life use-case benchmark:
+ - Typical use-case benchmark:
      * rollingcount
      * trident
      * uniquevisitor 
@@ -87,8 +87,7 @@ KAFKA_ROOT_PATH=/kafka/kafka-cluster-0
     benchmark/bin/run-all.sh
   ```
 
-5. Check results.
- The benchmark results will be stored at config path METRICS_PATH(default is: /root/benchmark/reports). It contains througput data and latency of the whole cluster.
+5. Check.  The benchmark results will be stored at config path METRICS_PATH(default is: /root/benchmark/reports). It contains througput data and latency of the whole cluster.
  
  The result of wordcount contains two files
 
