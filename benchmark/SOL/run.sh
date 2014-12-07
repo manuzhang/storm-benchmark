@@ -32,7 +32,7 @@ MESSAGE_SIZE=100
 SPOUT_NUM=4
 BOLT_NUM=4
 
-TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,topology.level=$TOPOLOGY_LEVEL,component.spout_num=$SPOUT_NUM,component.bolt_num=$BOLT_NUM
+TOPOLOGY_CONF=topology.name=$TOPOLOGY_NAME,topology.workers=$WORKERS,topology.acker.executors=$ACKERS,topology.max.spout.pending=$PENDING,benchmarks.level=$TOPOLOGY_LEVEL,component.spout_num=$SPOUT_NUM,component.bolt_num=$BOLT_NUM
 
 echo "========== running SOL =========="
 run_benchmark
