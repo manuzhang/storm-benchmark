@@ -5,9 +5,8 @@ DIR=`cd "${DIR}/.."; pwd`
 
 . $DIR/conf/config.sh
 
-
-for benchmark in `cat $DIR/conf/benchmarks.lst`; do
-  if [[ $benchmark == \#* ]]; then
+while read benchmark; do
+  if [[ ${benchmark:0:1} == '#' ]]; then
     continue
   else
     sh $DIR/$benchmark/run.sh
@@ -18,5 +17,5 @@ for benchmark in `cat $DIR/conf/benchmarks.lst`; do
     fi
     sleep 30s
   fi
-done
+done <$DIR/conf/benchmarks.lst
 

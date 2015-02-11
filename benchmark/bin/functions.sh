@@ -29,12 +29,20 @@ check() {
 }
 
 run_topology() {
+  OS="`uname`"
+  SED_OPT="-r"
+  case $OS in
+    'Darwin') 
+      SED_OPT="-E"
+      ;;
+    *) ;;
+  esac
   if [ -n "$KAFKA_CONF" ]; then
     CONFIG=$TOPOLOGY_CONF,$METRICS_CONF,$KAFKA_CONF
   else
     CONFIG=$TOPOLOGY_CONF,$METRICS_CONF
   fi
-  CONFIG=`echo $CONFIG | sed -r "s/,/ -c /g"`
+  CONFIG=`echo $CONFIG | sed $SED_OPT "s/,/ -c /g"`
   echo $CONFIG
   $BIN jar $JAR $MAIN_CLASS $TOPOLOGY_CLASS -c $CONFIG
 }
