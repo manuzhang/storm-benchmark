@@ -34,6 +34,7 @@ import storm.benchmark.api.IProducer;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
 import storm.kafka.bolt.KafkaBolt;
+import storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -108,7 +109,8 @@ public abstract class KafkaProducer  implements IProducer {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-      declarer.declare(new Fields(KafkaBolt.BOLT_KEY, KafkaBolt.BOLT_MESSAGE));
+      declarer.declare(new Fields(FieldNameBasedTupleToKafkaMapper.BOLT_KEY,
+              FieldNameBasedTupleToKafkaMapper.BOLT_MESSAGE));
     }
 
     @Override
