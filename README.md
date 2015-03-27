@@ -1,3 +1,7 @@
+# Storm Benchmark [![Build Status](https://travis-ci.org/intel-hadoop/storm-benchmark.svg?branch=master)](https://travis-ci.org/intel-hadoop/storm-benchmark?branch=master)
+
+
+
 ## How do we measure storm performance
 
 The benchmark set contains 9 workloads. They fall into two categories. The first category is "simple resource benchmark", the goal is to test how storm performs under pressure of certain resource. The second category is to measure how storm performs in real-life typical use cases.
