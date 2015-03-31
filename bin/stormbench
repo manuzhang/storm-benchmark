@@ -1,0 +1,67 @@
+#!/usr/bin/python
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import subprocess as sub
+import sys
+
+STORM_CMD = ""
+CONF_FILE = ""
+JAR_FILE = ""
+BENCHMARK = ""
+
+def exec_benchmark(args_list):
+  run_topology(args_list)
+
+def run_topology(args_list):
+  global CONF_FILE, MAIN_CLASS
+  conf_parts = os.path.realpath(CONF_FILE).split("/")
+  conf_file = conf_parts[-1]
+  conf_dir = "/".join(os.path.realpath(CONF_FILE).split("/")[:-1])
+  os.putenv("STORM_CONF_DIR", conf_dir)
+  run_args = [STORM_CMD, "jar", JAR_FILE, "--config", conf_file] + args_list
+  sub.call(run_args)
+
+
+def parse_config_opts(args):
+  curr = args[:]
+  curr.reverse()
+  args_list = []
+
+  while len(curr) > 0:
+    token = curr.pop()
+    if token == "-storm":
+      global STORM_CMD
+      STORM_CMD = curr.pop()
+    elif token == "-jar":
+      global JAR_FILE
+      JAR_FILE = curr.pop()
+    elif token == "-conf":
+      global CONF_FILE
+      CONF_FILE = curr.pop()
+    else:
+      args_list.append(token)
+
+  return args_list
+
+def main():
+  if len(sys.argv) <= 1:
+    sys.exit(-1)
+  args_list = parse_config_opts(sys.argv[1:])
+  exec_benchmark(args_list)
+
+if __name__ == "__main__":
+  main()
