@@ -47,9 +47,9 @@ import java.util.Random;
 public abstract class KafkaProducer  implements IProducer {
 
   public static final String SPOUT_ID = "spout";
-  public static final String SPOUT_NUM = "producer.spout_num";
+  public static final String SPOUT_NUM = "component.spout_num";
   public static final String BOLT_ID = "bolt";
-  public static final String BOLT_NUM = "producer.bolt_num";
+  public static final String BOLT_NUM = "component.bolt_num";
   public static final String BROKER_LIST = "broker.list";
   public static final String TOPIC = "topic";
 
