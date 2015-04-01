@@ -38,7 +38,7 @@ import static storm.benchmark.metrics.IMetricsCollector.MetricsItem;
 
 public class SOL extends StormBenchmark {
 
-  public static final String TOPOLOGY_LEVEL = "benchmarks.level";
+  public static final String TOPOLOGY_LEVEL = "topology.level";
   public static final String SPOUT_ID = "spout";
   public static final String SPOUT_NUM = "component.spout_num";
   public static final String BOLT_ID = "bolt";
