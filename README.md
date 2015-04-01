@@ -1,7 +1,5 @@
 # Storm Benchmark [![Build Status](https://travis-ci.org/intel-hadoop/storm-benchmark.svg?branch=master)](https://travis-ci.org/intel-hadoop/storm-benchmark?branch=master)
 
-
-
 ## How do we measure storm performance
 
 The benchmark set contains 9 workloads. They fall into two categories. The first category is "simple resource benchmark", the goal is to test how storm performs under pressure of certain resource. The second category is to measure how storm performs in real-life typical use cases.
@@ -22,6 +20,8 @@ The benchmark set contains 9 workloads. They fall into two categories. The first
 
 ## How to use
 
+This guide assumes a Storm cluster is already set up locally.
+
 1. Build. 
    
   First, build storm-benchmark.
@@ -30,73 +30,24 @@ The benchmark set contains 9 workloads. They fall into two categories. The first
     mvn package
   ```
 
-2. Config. modify `./benchmark/conf/config.sh`.
+2. Run.
 
+  ```bash
+    bin/stormbench -storm ${STORM_HOME}/bin/storm -jar ./target/storm-benchmark-${VERSION}-jar-with-dependencies.jar -conf ./conf/sol.yaml -c topology.workers=2 storm.benchmark.tools.Runner storm.benchmark.benchmarks.SOL 
+  ```
   
-  ```bash
-# Where is the storm binary
-BIN=/usr/lib/storm/bin/storm
+ * `-storm` directs stormbench to look for the storm command
+ * `-jar` sets the benchmark jar with all the dependencies in 
+ * `-conf` is for user to provide a yaml conf file like `storm/conf/storm.yaml`. Check the `storm-benchmark/conf` folder where conf files are already provided for existing benchmarks
+ * `-c` allows user to set conf through command line without modifying conf files every time
 
-# Absolute path to the stom-benchmark-with-dependencies.jar
-JAR=/root/storm-benchmark-0.1.0-jar-with-dependencies.jar
-
-# Please don't modify this
-MAIN_CLASS=storm.benchmark.tools.Runner
-
-# We will pull the metrics from nimbus periodically. This defines the interval.
-METRICS_POLL_INTERVAL=60000 # 60 secs
-
- # How long will we run for each benchmark.
-METRICS_TOTAL_TIME=300000  # 5 mins
-
-# Where we store the metrics reports. The metrics contains the performance and throughput information.
-METRICS_PATH=/root/benchmark/reports
-METRICS_CONF=metrics.time=$METRICS_TOTAL_TIME,metrics.poll=$METRICS_POLL_INTERVAL,metrics.path=$METRICS_PATH
-
-# The default workers we use for the benchmark.
-WORKERS=4
-
-# The default ack tasks we use for the benchmark.
-ACKERS=$WORKERS
-
-# The default max.spout.pending(it will override the default storm config) we use for the benchmarks.
-PENDING=200
-
-### the kafka configuration
- # Kafka broker list [node1:port1, node2:port2, ...]
-BROKER_LIST=intelidh-04:9092
-# Zookeeper server list [node1:port1, node2:port2, ...]
-ZOOKEEPER_SERVERS=intelidh-04:2181
-# the root path you create for Kafka in Zookeeper
-KAFKA_ROOT_PATH=/kafka/kafka-cluster-0  
-```
-
-3. Choose. Pick the benchmarks to run in `benchmark/conf/benchmark.lst`, for example, to run wordcount only
-
-  ```bash
-    wordcount
-    #sol
-    #rollingcount
-    #trident
-    #uniquevisitor
-    #pageview
-    #grep
-    #dataclean
-    #drpc
-  ```
-
-4. Run.  
-
-  ```bash 
-    benchmark/bin/run-all.sh
-  ```
-
-5. Check.  The benchmark results will be stored at config path METRICS_PATH(default is: /root/benchmark/reports). It contains througput data and latency of the whole cluster.
  
- The result of wordcount contains two files
+3. Check.  The benchmark results will be stored at config path METRICS_PATH(default is: reports). It contains throughput data and latency of the whole cluster.
+ 
+ The result of SOL contains two files
 
-    1. `WordCount_metrics_1402148415021.csv`, performnace data.
-    2. `WordCount_metrics_1402148415021.yaml`. The config used to run this test.
+    1. `SOL_metrics_1402148415021.csv`. Performnace data.
+    2. `SOL_metrics_1402148415021.yaml`. The config used to run this test.
 
 ## Supports
 
