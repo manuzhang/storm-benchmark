@@ -22,6 +22,7 @@ STORM_CMD = ""
 CONF_FILE = ""
 JAR_FILE = ""
 BENCHMARK = ""
+CONFIG_LIST = []
 
 def exec_benchmark(args_list):
   run_topology(args_list)
@@ -32,7 +33,7 @@ def run_topology(args_list):
   conf_file = conf_parts[-1]
   conf_dir = "/".join(os.path.realpath(CONF_FILE).split("/")[:-1])
   os.putenv("STORM_CONF_DIR", conf_dir)
-  run_args = [STORM_CMD, "jar", JAR_FILE, "--config", conf_file] + args_list
+  run_args = [STORM_CMD, "jar", JAR_FILE, "--config", conf_file] + CONFIG_LIST + args_list
   sub.call(run_args)
 
 
@@ -52,13 +53,21 @@ def parse_config_opts(args):
     elif token == "-conf":
       global CONF_FILE
       CONF_FILE = curr.pop()
+    elif token == "-c":
+      global CONFIG_LIST
+      CONFIG_LIST.append(token)
+      CONFIG_LIST.append(curr.pop())
     else:
       args_list.append(token)
 
   return args_list
 
+def print_usage():
+  print("Usage: stormbench -storm <storm command path> -jar <storm-benchmark jar> -conf <config file path> -c <command line options> <main_class> <arguments>")
+
 def main():
   if len(sys.argv) <= 1:
+    print_usage()
     sys.exit(-1)
   args_list = parse_config_opts(sys.argv[1:])
   exec_benchmark(args_list)
