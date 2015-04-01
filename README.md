@@ -46,7 +46,7 @@ This guide assumes a Storm cluster is already set up locally.
  
  The result of SOL contains two files
 
-    1. `SOL_metrics_1402148415021.csv`. Performnace data.
+    1. `SOL_metrics_1402148415021.csv`. Performance data.
     2. `SOL_metrics_1402148415021.yaml`. The config used to run this test.
 
 ## Supports
