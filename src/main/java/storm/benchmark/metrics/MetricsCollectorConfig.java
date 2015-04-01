@@ -34,6 +34,7 @@ public class MetricsCollectorConfig {
   public static final String CONF_FILE_FORMAT = "%s/%s_metrics_%d.yaml";
   public static final String DATA_FILE_FORMAT = "%s/%s_metrics_%d.csv";
 
+  public static final String METRICS_ENABLED = "metrics.enabled";
   public static final String METRICS_POLL_INTERVAL = "metrics.poll";
   public static final String METRICS_TOTAL_TIME = "metrics.time";
   public static final String METRICS_PATH = "metrics.path";
