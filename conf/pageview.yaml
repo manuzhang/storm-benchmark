@@ -15,6 +15,7 @@
 # limitations under the License.
 
 # metrics configurations
+metrics.enabled: true
 metrics.poll: 60000 # 60 secs
 metrics.time: 300000 # 5 mins
 metrics.path: "reports"

@@ -29,6 +29,7 @@ import storm.benchmark.api.IApplication;
 import storm.benchmark.api.IBenchmark;
 import storm.benchmark.api.IProducer;
 import storm.benchmark.metrics.IMetricsCollector;
+import storm.benchmark.metrics.MetricsCollectorConfig;
 
 /**
  * Runner is the main class of storm benchmark
@@ -66,8 +67,10 @@ public class Runner {
           throws AlreadyAliveException, InvalidTopologyException,
           ClassNotFoundException, IllegalAccessException, InstantiationException {
     runApplication(benchmark);
-    IMetricsCollector collector = benchmark.getMetricsCollector(config, topology);
-    collector.run();
+    if (isMetricsEnabled()) {
+      IMetricsCollector collector = benchmark.getMetricsCollector(config, topology);
+      collector.run();
+    }
   }
 
   public static void runProducer(IProducer producer)
@@ -88,5 +91,9 @@ public class Runner {
     String name = (String) config.get(Config.TOPOLOGY_NAME);
     topology = app.getTopology(config);
     StormSubmitter.submitTopology(name, config, topology);
+  }
+
+  private static boolean isMetricsEnabled() {
+    return (Boolean) config.get(MetricsCollectorConfig.METRICS_ENABLED);
   }
 }
