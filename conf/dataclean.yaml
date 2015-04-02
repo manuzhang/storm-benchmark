@@ -24,7 +24,7 @@ metrics.path: "reports"
 broker.list: "127.0.0.1:9092"
 zookeeper.servers: "127.0.0.1:2181"
 kafka.root.path: "/kafka"
-topic: "fileread"
+topic: "pageview"
 client_id: "data_cleanse"
 
 # topology configurations
