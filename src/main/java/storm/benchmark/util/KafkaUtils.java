@@ -47,10 +47,10 @@ public final class KafkaUtils {
 
     BrokerHosts hosts = new ZkHosts(connectString);
     String topic = (String) Utils.get(options, TOPIC, DEFAULT_TOPIC);
-    String zkRoot = kafkaRoot + "/" + "storm-consumer-states";
     String appId = (String) Utils.get(options, CLIENT_ID, "storm-app");
 
-    SpoutConfig config = new SpoutConfig(hosts, topic, zkRoot, appId);
+    SpoutConfig config = new SpoutConfig(hosts, topic, kafkaRoot, appId);
+    config.forceFromStart = true;
     config.zkServers = new ArrayList<String>();
 
     String [] servers = zkServers.split(",");
