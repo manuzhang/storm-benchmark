@@ -43,9 +43,9 @@ public final class KafkaUtils {
   public static SpoutConfig getSpoutConfig(Map options, MultiScheme scheme) throws IllegalArgumentException {
     String zkServers = (String) Utils.get(options, ZOOKEEPER_SERVERS, "localhost:2181");
     String kafkaRoot = (String) Utils.get(options, KAFKA_ROOT_PATH, "/kafka");
-    String connectString = zkServers + kafkaRoot;
+    
 
-    BrokerHosts hosts = new ZkHosts(connectString);
+    BrokerHosts hosts = new ZkHosts(zkServers);
     String topic = (String) Utils.get(options, TOPIC, DEFAULT_TOPIC);
     String appId = (String) Utils.get(options, CLIENT_ID, "storm-app");
 
