@@ -18,12 +18,12 @@
 
 package storm.benchmark.util;
 
-import backtype.storm.spout.MultiScheme;
-import backtype.storm.utils.Utils;
-import storm.kafka.BrokerHosts;
-import storm.kafka.SpoutConfig;
-import storm.kafka.ZkHosts;
-import storm.kafka.trident.TridentKafkaConfig;
+import org.apache.storm.kafka.BrokerHosts;
+import org.apache.storm.kafka.SpoutConfig;
+import org.apache.storm.kafka.ZkHosts;
+import org.apache.storm.kafka.trident.TridentKafkaConfig;
+import org.apache.storm.spout.MultiScheme;
+import org.apache.storm.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -50,7 +50,7 @@ public final class KafkaUtils {
     String appId = (String) Utils.get(options, CLIENT_ID, "storm-app");
 
     SpoutConfig config = new SpoutConfig(hosts, topic, kafkaRoot, appId);
-    config.forceFromStart = true;
+    config.ignoreZkOffsets = true;
     config.zkServers = new ArrayList<String>();
 
     String [] servers = zkServers.split(",");

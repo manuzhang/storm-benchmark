@@ -22,7 +22,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import storm.benchmark.lib.reducer.LongSummer;
 import storm.benchmark.lib.reducer.Reducer;
-import storm.benchmark.tools.SlidingWindow;
 
 import java.util.Map;
 

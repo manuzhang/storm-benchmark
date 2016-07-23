@@ -18,14 +18,13 @@
 
 package storm.benchmark.tools;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.InvalidTopologyException;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.utils.Utils;
 import storm.benchmark.api.IBenchmark;
 import storm.benchmark.metrics.IMetricsCollector;
 import storm.benchmark.metrics.MetricsCollectorConfig;

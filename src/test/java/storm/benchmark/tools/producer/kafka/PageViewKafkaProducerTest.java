@@ -18,10 +18,10 @@
 
 package storm.benchmark.tools.producer.kafka;
 
-import backtype.storm.Config;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.tuple.Values;
+import org.apache.storm.Config;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.tuple.Values;
 import org.testng.annotations.Test;
 import storm.benchmark.tools.PageViewGenerator;
 
@@ -30,7 +30,10 @@ import java.util.Map;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static storm.benchmark.tools.producer.kafka.PageViewKafkaProducer.PageViewSpout;
 
 public class PageViewKafkaProducerTest {

@@ -18,16 +18,16 @@
 
 package storm.benchmark.benchmarks;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.IRichSpout;
-import backtype.storm.topology.TopologyBuilder;
 import com.google.common.collect.Sets;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.IRichSpout;
+import org.apache.storm.topology.TopologyBuilder;
+import storm.benchmark.benchmarks.common.StormBenchmark;
 import storm.benchmark.lib.bolt.ConstBolt;
 import storm.benchmark.lib.spout.RandomMessageSpout;
 import storm.benchmark.metrics.BasicMetricsCollector;
 import storm.benchmark.metrics.IMetricsCollector;
-import storm.benchmark.benchmarks.common.StormBenchmark;
 import storm.benchmark.util.BenchmarkUtils;
 
 import static storm.benchmark.metrics.IMetricsCollector.MetricsItem;

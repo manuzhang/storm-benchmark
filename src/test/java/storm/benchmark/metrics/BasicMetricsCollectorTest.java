@@ -18,9 +18,9 @@
 
 package storm.benchmark.metrics;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
 import com.google.common.collect.Sets;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

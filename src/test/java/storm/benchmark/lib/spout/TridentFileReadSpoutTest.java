@@ -18,17 +18,21 @@
 
 package storm.benchmark.lib.spout;
 
-import backtype.storm.tuple.Values;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.tuple.Values;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import storm.benchmark.tools.FileReader;
-import storm.trident.operation.TridentCollector;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TridentFileReadSpoutTest {
 

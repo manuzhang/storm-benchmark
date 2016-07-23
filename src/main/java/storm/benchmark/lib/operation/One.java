@@ -18,8 +18,8 @@
 
 package storm.benchmark.lib.operation;
 
-import storm.trident.operation.CombinerAggregator;
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.operation.CombinerAggregator;
+import org.apache.storm.trident.tuple.TridentTuple;
 
 public class One implements CombinerAggregator<Integer> {
   @Override

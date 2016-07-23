@@ -18,13 +18,13 @@
 
 package storm.benchmark.benchmarks;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.spout.SchemeAsMultiScheme;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.kafka.KafkaSpout;
+import org.apache.storm.kafka.StringScheme;
+import org.apache.storm.spout.SchemeAsMultiScheme;
 import storm.benchmark.benchmarks.common.WordCount;
 import storm.benchmark.util.KafkaUtils;
-import storm.kafka.KafkaSpout;
-import storm.kafka.StringScheme;
 
 public class KafkaWordCount extends WordCount {
 

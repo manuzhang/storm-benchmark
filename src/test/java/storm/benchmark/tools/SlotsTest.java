@@ -18,16 +18,16 @@
 
 package storm.benchmark.tools;
 
-import backtype.storm.utils.MutableObject;
+import org.apache.storm.utils.MutableObject;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import storm.benchmark.lib.reducer.Reducer;
 
-import static storm.benchmark.tools.SlidingWindow.Slots;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static storm.benchmark.tools.SlidingWindow.Slots;
 
 public class SlotsTest {
   private static final Object ANY_OBJECT = "ANY_OBJECT";

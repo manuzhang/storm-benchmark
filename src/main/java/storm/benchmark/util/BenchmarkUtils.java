@@ -18,9 +18,9 @@
 
 package storm.benchmark.util;
 
-import backtype.storm.Config;
-import backtype.storm.utils.Utils;
 import org.apache.log4j.Logger;
+import org.apache.storm.Config;
+import org.apache.storm.utils.Utils;
 
 import java.util.Iterator;
 import java.util.Map;

@@ -18,10 +18,10 @@
 
 package storm.benchmark.benchmarks.common;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
 import storm.benchmark.api.IBenchmark;
 import storm.benchmark.metrics.BasicMetricsCollector;
 import storm.benchmark.metrics.IMetricsCollector;

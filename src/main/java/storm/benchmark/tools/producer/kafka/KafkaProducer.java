@@ -18,26 +18,27 @@
 
 package storm.benchmark.tools.producer.kafka;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.IRichBolt;
-import backtype.storm.topology.IRichSpout;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.kafka.bolt.KafkaBolt;
+import org.apache.storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
+import org.apache.storm.kafka.bolt.selector.DefaultTopicSelector;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.IRichBolt;
+import org.apache.storm.topology.IRichSpout;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.topology.base.BaseRichSpout;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.Utils;
 import storm.benchmark.api.IProducer;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
-import storm.kafka.bolt.KafkaBolt;
-import storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 
 /**
@@ -57,37 +58,39 @@ public abstract class KafkaProducer  implements IProducer {
   public static final int DEFAULT_BOLT_NUM = 4;
 
   protected IRichSpout spout;
-  protected final IRichBolt bolt = new KafkaBolt<String, String>();
 
   @Override
   public StormTopology getTopology(Config config) {
-    config.putAll(getKafkaConfig(config));
-
     final int spoutNum = BenchmarkUtils.getInt(config , SPOUT_NUM, DEFAULT_SPOUT_NUM);
     final int boltNum = BenchmarkUtils.getInt(config, BOLT_NUM, DEFAULT_BOLT_NUM);
 
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout(SPOUT_ID, spout, spoutNum);
+    IRichBolt bolt = getBolt(config);
     builder.setBolt(BOLT_ID, bolt, boltNum).localOrShuffleGrouping(SPOUT_ID);
     return builder.createTopology();
   }
 
-  public IRichSpout getSpout() {
-    return spout;
+  private KafkaBolt getBolt(Config config) {
+    KafkaBolt bolt = new KafkaBolt<String, String>();
+
+    Properties props = new Properties();
+    String brokers = (String) Utils.get(config, BROKER_LIST, "localhost:9092");
+    props.put("metadata.broker.list", brokers);
+    props.put("serializer.class", "kafka.serializer.StringEncoder");
+    props.put("key.serializer.class", "kafka.serializer.StringEncoder");
+    props.put("request.required.acks", "1");
+    bolt.withProducerProperties(props);
+
+    String topic = (String) Utils.get(config, TOPIC, KafkaUtils.DEFAULT_TOPIC);
+    DefaultTopicSelector topicSelector = new DefaultTopicSelector(topic);
+    bolt.withTopicSelector(topicSelector);
+
+    return bolt;
   }
 
-  private Map getKafkaConfig(Map options) {
-    Map kafkaConfig = new HashMap();
-    Map brokerConfig = new HashMap();
-    String brokers = (String) Utils.get(options, BROKER_LIST, "localhost:9092");
-    String topic = (String) Utils.get(options, TOPIC, KafkaUtils.DEFAULT_TOPIC);
-    brokerConfig.put("metadata.broker.list", brokers);
-    brokerConfig.put("serializer.class", "kafka.serializer.StringEncoder");
-    brokerConfig.put("key.serializer.class", "kafka.serializer.StringEncoder");
-    brokerConfig.put("request.required.acks", "1");
-    kafkaConfig.put(KafkaBolt.KAFKA_BROKER_PROPERTIES, brokerConfig);
-    kafkaConfig.put(KafkaBolt.TOPIC, topic);
-    return kafkaConfig;
+  public IRichSpout getSpout() {
+    return spout;
   }
 
   /**

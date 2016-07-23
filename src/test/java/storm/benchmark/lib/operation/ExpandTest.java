@@ -18,16 +18,19 @@
 
 package storm.benchmark.lib.operation;
 
-import backtype.storm.tuple.Values;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.tuple.Values;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import storm.trident.operation.TridentCollector;
-import storm.trident.tuple.TridentTuple;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ExpandTest {
 

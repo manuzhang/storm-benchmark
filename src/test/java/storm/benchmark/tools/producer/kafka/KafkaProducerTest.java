@@ -18,14 +18,11 @@
 
 package storm.benchmark.tools.producer.kafka;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.utils.Utils;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.utils.Utils;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import storm.benchmark.tools.producer.kafka.FileReadKafkaProducer;
-import storm.benchmark.tools.producer.kafka.PageViewKafkaProducer;
-import storm.benchmark.tools.producer.kafka.KafkaProducer;
 import storm.benchmark.util.TestUtils;
 
 import static org.fest.assertions.api.Assertions.assertThat;

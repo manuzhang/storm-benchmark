@@ -18,8 +18,8 @@
 
 package storm.benchmark.benchmarks;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
 import storm.benchmark.benchmarks.common.WordCount;
 import storm.benchmark.lib.spout.FileReadSpout;
 import storm.benchmark.util.BenchmarkUtils;

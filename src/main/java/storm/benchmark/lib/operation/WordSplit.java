@@ -18,11 +18,11 @@
 
 package storm.benchmark.lib.operation;
 
-import backtype.storm.tuple.Values;
 import org.apache.log4j.Logger;
-import storm.trident.operation.BaseFunction;
-import storm.trident.operation.TridentCollector;
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.operation.BaseFunction;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.tuple.Values;
 
 public class WordSplit extends BaseFunction {
 

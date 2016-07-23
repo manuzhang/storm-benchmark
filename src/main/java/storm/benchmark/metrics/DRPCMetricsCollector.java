@@ -25,11 +25,11 @@ package storm.benchmark.metrics;
  * receiving the result
  */
 
-import backtype.storm.Config;
-import backtype.storm.generated.DRPCExecutionException;
-import backtype.storm.utils.DRPCClient;
 import org.apache.log4j.Logger;
-import org.apache.thrift7.TException;
+import org.apache.storm.Config;
+import org.apache.storm.generated.DRPCExecutionException;
+import org.apache.storm.thrift.TException;
+import org.apache.storm.utils.DRPCClient;
 import storm.benchmark.util.FileUtils;
 
 import java.io.PrintWriter;
@@ -104,9 +104,9 @@ public class DRPCMetricsCollector implements IMetricsCollector {
     return ret;
   }
 
-  private long execute(String arg, PrintWriter writer) throws TException, DRPCExecutionException {
+  private long execute(String arg, PrintWriter writer) throws TException {
     LOG.debug(String.format("executing %s('%s')", function, arg));
-    DRPCClient client = new DRPCClient(DRPC_SERVER, port);
+    DRPCClient client = new DRPCClient(config.stormConfig, DRPC_SERVER, port);
     long start = System.currentTimeMillis();
     String result = client.execute(function, arg);
     long end = System.currentTimeMillis();

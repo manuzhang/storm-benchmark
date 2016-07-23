@@ -18,11 +18,19 @@
 
 package storm.benchmark.benchmarks.common;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import storm.benchmark.benchmarks.*;
+import storm.benchmark.benchmarks.DRPC;
+import storm.benchmark.benchmarks.DataClean;
+import storm.benchmark.benchmarks.FileReadWordCount;
+import storm.benchmark.benchmarks.Grep;
+import storm.benchmark.benchmarks.PageViewCount;
+import storm.benchmark.benchmarks.RollingCount;
+import storm.benchmark.benchmarks.SOL;
+import storm.benchmark.benchmarks.TridentWordCount;
+import storm.benchmark.benchmarks.UniqueVisitor;
 import storm.benchmark.metrics.BasicMetricsCollector;
 import storm.benchmark.metrics.DRPCMetricsCollector;
 import storm.benchmark.metrics.IMetricsCollector;

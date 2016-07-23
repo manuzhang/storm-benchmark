@@ -19,8 +19,8 @@
 package storm.benchmark.lib.operation;
 
 import com.google.common.collect.Sets;
+import org.apache.storm.trident.tuple.TridentTuple;
 import org.testng.annotations.Test;
-import storm.trident.tuple.TridentTuple;
 
 import java.util.HashSet;
 import java.util.Set;

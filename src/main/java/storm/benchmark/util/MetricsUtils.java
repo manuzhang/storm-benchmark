@@ -18,10 +18,10 @@
 
 package storm.benchmark.util;
 
-import backtype.storm.generated.ClusterSummary;
-import backtype.storm.generated.ExecutorStats;
-import backtype.storm.generated.SpoutStats;
-import backtype.storm.generated.TopologySummary;
+import org.apache.storm.generated.ClusterSummary;
+import org.apache.storm.generated.ExecutorStats;
+import org.apache.storm.generated.SpoutStats;
+import org.apache.storm.generated.TopologySummary;
 
 import java.util.LinkedList;
 import java.util.List;

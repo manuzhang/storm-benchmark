@@ -18,36 +18,20 @@
 
 package storm.benchmark.benchmarks;
 
-import backtype.storm.Config;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.spout.SchemeAsMultiScheme;
-import backtype.storm.tuple.Fields;
-import backtype.storm.utils.Utils;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import storm.benchmark.lib.operation.WordSplit;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.kafka.StringScheme;
+import org.apache.storm.kafka.trident.TransactionalTridentKafkaSpout;
+import org.apache.storm.spout.SchemeAsMultiScheme;
+import org.apache.storm.trident.TridentTopology;
+import org.apache.storm.trident.operation.builtin.Count;
+import org.apache.storm.trident.spout.IPartitionedTridentSpout;
+import org.apache.storm.trident.testing.MemoryMapState;
+import org.apache.storm.tuple.Fields;
 import storm.benchmark.benchmarks.common.StormBenchmark;
+import storm.benchmark.lib.operation.WordSplit;
 import storm.benchmark.util.BenchmarkUtils;
 import storm.benchmark.util.KafkaUtils;
-import storm.kafka.StringScheme;
-import storm.kafka.trident.TransactionalTridentKafkaSpout;
-import storm.trident.TridentTopology;
-import storm.trident.operation.builtin.Count;
-import storm.trident.planner.*;
-import storm.trident.planner.processor.AggregateProcessor;
-import storm.trident.planner.processor.EachProcessor;
-import storm.trident.planner.processor.PartitionPersistProcessor;
-import storm.trident.spout.IPartitionedTridentSpout;
-import storm.trident.testing.MemoryMapState;
-import storm.trident.util.IndexedEdge;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 
 public class TridentWordCount extends StormBenchmark {

@@ -19,7 +19,6 @@
 package storm.benchmark.tools;
 
 import org.testng.annotations.Test;
-import storm.benchmark.tools.FileReader;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
